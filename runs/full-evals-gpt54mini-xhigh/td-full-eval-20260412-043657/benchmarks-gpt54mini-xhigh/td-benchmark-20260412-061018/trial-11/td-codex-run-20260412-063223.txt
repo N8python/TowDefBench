@@ -1,0 +1,2364 @@
+OpenAI Codex v0.118.0 (research preview)
+--------
+workdir: /Users/natebreslow/Documents/pvzEval
+model: gpt-5.4-mini
+provider: openai
+approval: never
+sandbox: danger-full-access
+reasoning effort: xhigh
+reasoning summaries: none
+session id: 019d8064-342d-76f1-bfa3-d1baf1ba1f6f
+--------
+user
+Beat the current tower defense level autonomously. This is a gameplay evaluation, not a coding task. Use only the provided gameplay tools to inspect state and act. Do not edit files, do not modify configuration, and do not use shell commands unless absolutely necessary. You get exactly one attempt. There is no restart tool. Use instructions and guide as needed, keep playing until the level ends in either Win or Loss, and then give a concise summary of the result and the key decisions.
+codex
+I’m checking the game rules and current board state first so I can make decisions without wasting the one run.
+td> instructions
+Instructions:
+  This is a turn-based tower defense benchmark.
+  Goal: survive the monster waves.
+  Loss: if a monster reaches the left edge of the grid, you lose.
+  Turn flow: deploy, clear, or inspect as needed, then type `next` to resolve one turn.
+  Energy: defenses cost energy. You start with 2 energy, gain 1 ambient energy every 2 turns, and power plants make extra energy.
+  Monsters: monsters enter from the right side and move left over time.
+  Board shape: columns 1-9 are deployable; column 10 is monster-entry only.
+  Recommendation: before acting, use `guide` on every defense and monster in this level.
+  This MCP harness gives you one attempt only; there is no restart tool.
+
+Defenses in this level:
+  pwr: generates extra energy after a short delay, then every 4 turns.
+  bst: strikes the tile behind it for 8 damage.
+  ice: fires like a turret, but slows monsters so they only act every other turn.
+  can: hits a lane target for 4, then splashes nearby monsters for 1 every other turn.
+  lin: clears an entire lane and is consumed.
+  for: a tougher blocker that strips a leaper's jump.
+  acd: hits all occupied tiles up to four spaces ahead.
+
+Monsters in this level:
+  ske: basic monster.
+  her: marks a major wave.
+  lea: fast monster that jumps the first defense ahead and can break through the landing defense.
+  nec: slow monster that periodically summons skeletons into open neighboring cells.
+  ber: becomes much faster and stronger after it drops to half health.
+  jug: a rolling behemoth that crushes everything in its path.
+
+Mechanics:
+  Most monsters hit the defense directly in front of them for 1 damage.
+  Some special monsters break that rule; use `guide` to check exact behavior.
+  If no defense is in front of a monster, it moves forward.
+  Defenses attack or generate energy before monsters move each turn.
+  You cannot place a defense on an occupied tile.
+  A tile cannot have more than one occupant: defense or monster.
+
+Type `help` for the agent command reference and board legend.
+Level 3 | Turn 0 | Energy 2 | Waves 0/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:6 | ice 7 cd:2 | can 12 cd:2 | lin 5 cd:10 | for 5 cd:6 | acd 5 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> help
+Commands:
+  show
+  deploy <name> <row> <col>  Example: deploy powerplant 2 4
+  clear <row> <col>          Example: clear 2 4
+  inspect <row> <col>        Example: inspect 1 10
+  guide <entry>              Detailed field guide entry
+  next                       Advance exactly one turn
+  status
+  instructions               Full gameplay guide
+Defense names ignore case, spaces, hyphens, and underscores.
+Columns 1-9 are deployable. Column 10 is monster-entry only.
+
+Board legend:
+  Tokens are <abbr>:<hp>.
+  Defenses in this level: Pwr:1 Bst:1 Ice:1 Can:1 Lin:1 For:16 Acd:1
+  Monsters in this level: Ske:3 Her:3 Lea:6 Nec:5 Ber:6 Jug:20
+  . means an empty tile.
+
+Examples:
+  deploy pwr 2 4
+  clear 2 4
+  inspect 1 10
+  guide lea
+  next
+Level 3 | Turn 0 | Energy 2 | Waves 0/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:6 | ice 7 cd:2 | can 12 cd:2 | lin 5 cd:10 | for 5 cd:6 | acd 5 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> status
+Level: Level 3
+Turn: 0
+Energy: 2
+Loadout: pwr 2 ready | bst 2 cd:6 | ice 7 cd:2 | can 12 cd:2 | lin 5 cd:10 | for 5 cd:6 | acd 5 cd:2
+Entities: none
+Level 3 | Turn 0 | Energy 2 | Waves 0/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:6 | ice 7 cd:2 | can 12 cd:2 | lin 5 cd:10 | for 5 cd:6 | acd 5 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> show
+Level 3 | Turn 0 | Energy 2 | Waves 0/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:6 | ice 7 cd:2 | can 12 cd:2 | lin 5 cd:10 | for 5 cd:6 | acd 5 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+I have the board and loadout. Next I’m pulling the field-guide entries for every unit in this level so I can place the right mix before advancing turns.
+td> guide pwr
+PowerPlant
+Type: defense
+Abbreviation: pwr
+Cost: 2 energy
+HP: 1
+Recharge: 2 turns
+Role: economy defense.
+Behavior: starts with 1 turn until its first energy pulse, then generates 1 energy every 4 turns.
+Use: invest early so later turns can support more expensive defenses and attackers.
+Level 3 | Turn 0 | Energy 2 | Waves 0/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:6 | ice 7 cd:2 | can 12 cd:2 | lin 5 cd:10 | for 5 cd:6 | acd 5 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> guide bst
+Backstabber
+Type: defense
+Abbreviation: bst
+Cost: 2 energy
+HP: 1
+Recharge: 6 turns
+Role: reverse ambush defense.
+Behavior: deals 8 damage to the monster in the tile immediately to its left.
+Placement rule: to target a monster at row X, col Y, place Backstabber at row X, col Y + 1.
+Use: punishes monsters that slip past it or get dropped behind your main line.
+Level 3 | Turn 0 | Energy 2 | Waves 0/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:6 | ice 7 cd:2 | can 12 cd:2 | lin 5 cd:10 | for 5 cd:6 | acd 5 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> guide ice
+IceTurret
+Type: defense
+Abbreviation: ice
+Cost: 7 energy
+HP: 1
+Recharge: 2 turns
+Role: control defense.
+Behavior: fires at the nearest monster ahead for 1 damage and applies slow.
+Slow: slowed monsters only act every other turn.
+Use: slows dangerous lanes and buys time for your other defenses.
+Level 3 | Turn 0 | Energy 2 | Waves 0/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:6 | ice 7 cd:2 | can 12 cd:2 | lin 5 cd:10 | for 5 cd:6 | acd 5 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> guide can
+Cannon
+Type: defense
+Abbreviation: can
+Cost: 12 energy
+HP: 1
+Recharge: 2 turns
+Role: heavy splash damage.
+Behavior: on firing turns, it targets the first monster ahead in its lane, deals 4 damage to that monster, then deals 1 splash damage in a 3x3 box around the target tile.
+Cadence: it fires on the first turn after being deployed, then only every other turn.
+Use: expensive but excellent when lanes stack multiple monsters close together.
+Level 3 | Turn 0 | Energy 2 | Waves 0/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:6 | ice 7 cd:2 | can 12 cd:2 | lin 5 cd:10 | for 5 cd:6 | acd 5 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> guide lin
+LineBomb
+Type: defense
+Abbreviation: lin
+Cost: 5 energy
+HP: 1
+Recharge: 10 turns
+Role: lane wipe.
+Behavior: on its action, it destroys every monster in its entire row and is consumed.
+Use: emergency answer when one lane is overwhelmed.
+Level 3 | Turn 0 | Energy 2 | Waves 0/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:6 | ice 7 cd:2 | can 12 cd:2 | lin 5 cd:10 | for 5 cd:6 | acd 5 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> guide for
+ForceWall
+Type: defense
+Abbreviation: for
+Cost: 5 energy
+HP: 16
+Recharge: 6 turns
+Role: anti-jump blocker.
+Behavior: does not attack; it absorbs hits and stops Leapers from jumping over it.
+Jump rule: if a Leaper meets a ForceWall directly ahead, it loses its leap and stays in place.
+Use: high-cost wall for lanes where jumpers would otherwise break your formation.
+Level 3 | Turn 0 | Energy 2 | Waves 0/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:6 | ice 7 cd:2 | can 12 cd:2 | lin 5 cd:10 | for 5 cd:6 | acd 5 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> guide acd
+AcidSprayer
+Type: defense
+Abbreviation: acd
+Cost: 5 energy
+HP: 1
+Recharge: 2 turns
+Role: short-range line splash.
+Behavior: if any monster is within the four tiles directly ahead, it deals 1 damage to every occupied tile in that four-tile stretch.
+Use: rewards tight lanes and clustered monsters, especially when several threats stack together.
+Level 3 | Turn 0 | Energy 2 | Waves 0/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:6 | ice 7 cd:2 | can 12 cd:2 | lin 5 cd:10 | for 5 cd:6 | acd 5 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> guide ske
+Skeleton
+Type: monster
+Abbreviation: ske
+Wave cost: 1 point
+HP: 3
+Speed: 1 tile per action
+Behavior: if a defense is directly ahead, it hits for 1 damage; otherwise it moves left.
+Threat: the default pressure unit that tests whether a lane has enough sustained damage.
+Level 3 | Turn 0 | Energy 2 | Waves 0/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:6 | ice 7 cd:2 | can 12 cd:2 | lin 5 cd:10 | for 5 cd:6 | acd 5 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> guide her
+Herald
+Type: monster
+Abbreviation: her
+Wave cost: 1 point
+HP: 3
+Speed: 1 tile per action
+Behavior: same as a Skeleton, but used to mark a major wave.
+Threat: mechanically ordinary, but its arrival signals a major wave milestone.
+Level 3 | Turn 0 | Energy 2 | Waves 0/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:6 | ice 7 cd:2 | can 12 cd:2 | lin 5 cd:10 | for 5 cd:6 | acd 5 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> guide lea
+Leaper
+Type: monster
+Abbreviation: lea
+Wave cost: 2 points
+HP: 6
+Speed: 2 before jump, 1 after jump
+Behavior: before jumping, it advances quickly. If the tile directly ahead has a defense, it targets the tile two spaces left as its landing tile.
+Landing rule: if that landing tile is empty, it jumps there. If it has a defense, it deals 1 damage; if that defense dies, the Leaper moves into the now-empty tile, otherwise it stays put. If the landing tile has a monster, the jump does not happen.
+After jumping: it loses the leap bonus, drops to speed 1, and behaves like a normal monster.
+Threat: punishes relying on a single front-line blocker, because it can skip the first defense and may break through the defense behind it too.
+Level 3 | Turn 0 | Energy 2 | Waves 0/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:6 | ice 7 cd:2 | can 12 cd:2 | lin 5 cd:10 | for 5 cd:6 | acd 5 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> guide nec
+Necromancer
+Type: monster
+Abbreviation: nec
+Wave cost: 5 points
+HP: 5
+Speed: acts every other turn
+Behavior: on the second time it would act, and every six action turns after that, it summons a Skeleton into every open neighboring tile above, ahead, below, and behind before moving.
+Threat: multiplies pressure across nearby tiles, so ignoring it lets one lane become several.
+Level 3 | Turn 0 | Energy 2 | Waves 0/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:6 | ice 7 cd:2 | can 12 cd:2 | lin 5 cd:10 | for 5 cd:6 | acd 5 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> guide ber
+Berserker
+Type: monster
+Abbreviation: ber
+Wave cost: 2 points
+HP: 6
+Speed: 1 normally, 2 when enraged
+Behavior: bites for 1 damage until it drops to 3 HP. At 3 HP or below, it becomes enraged, moves at speed 2, and deals 2 damage per attack.
+Threat: punishes partial damage, because weakening it makes it more explosive instead of safer.
+Level 3 | Turn 0 | Energy 2 | Waves 0/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:6 | ice 7 cd:2 | can 12 cd:2 | lin 5 cd:10 | for 5 cd:6 | acd 5 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> guide jug
+Juggernaut
+Type: monster
+Abbreviation: jug
+Wave cost: 7 points
+HP: 20
+Speed: 2 on its first successful move, then 1
+Behavior: crushes any defenses or monsters in every tile it travels through, then ends on the furthest traversed tile.
+Threat: a lane-resetting tank that deletes blockers and friendly monsters alike while rolling forward.
+Level 3 | Turn 0 | Energy 2 | Waves 0/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:6 | ice 7 cd:2 | can 12 cd:2 | lin 5 cd:10 | for 5 cd:6 | acd 5 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+I’m opening with economy: one power plant in a safe backline slot so the rest of the board can scale before the midgame threats arrive.
+td> deploy pwr 3 1
+Deployed PowerPlant at row 3, column 1.
+Level 3 | Turn 0 | Energy 0 | Waves 0/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 cd:2 | bst 2 cd:6 | ice 7 cd:2 | can 12 cd:2 | lin 5 cd:10 | for 5 cd:6 | acd 5 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+I’ve got the first plant down. I’m advancing one turn now to see the spawn pattern and whether the economy starts paying off immediately.
+td> next
+Level 3 | Turn 1 | Energy 1 | Waves 0/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 cd:1 | bst 2 cd:5 | ice 7 cd:1 | can 12 cd:1 | lin 5 cd:9 | for 5 cd:5 | acd 5 cd:1
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+Nothing has spawned yet, so I’m letting the turn cycle once more to convert that first plant into enough energy for a second placement.
+td> next
+Level 3 | Turn 2 | Energy 2 | Waves 0/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:4 | ice 7 low | can 12 low | lin 5 cd:8 | for 5 cd:4 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+I have the first economy plant online, and the board is still clear. I’m adding a second plant in a different lane rather than gambling on early damage before I know the spawn mix.
+td> deploy pwr 2 1
+Deployed PowerPlant at row 2, column 1.
+Level 3 | Turn 2 | Energy 0 | Waves 0/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 cd:2 | bst 2 cd:4 | ice 7 low | can 12 low | lin 5 cd:8 | for 5 cd:4 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The backline is started. I’m advancing to the point where the first threats should appear, then I’ll switch from pure economy to lane-specific defense.
+td> next
+Level 3 | Turn 3 | Energy 1 | Waves 0/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 cd:1 | bst 2 cd:3 | ice 7 low | can 12 low | lin 5 cd:7 | for 5 cd:3 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The opener is stable. I’m still waiting for the first spawn tick, so I’m advancing again rather than spending the single energy on a low-impact filler.
+td> next
+Level 3 | Turn 4 | Energy 2 | Waves 1/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:2 | ice 7 low | can 12 low | lin 5 cd:6 | for 5 cd:2 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The first spawn is a basic skeleton in the bottom lane. I’m still prioritizing economy because it’s far enough away to buy time, and the extra income will matter more than one cheap attack right now.
+td> deploy pwr 5 1
+Deployed PowerPlant at row 5, column 1.
+Level 3 | Turn 4 | Energy 0 | Waves 1/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 cd:2 | bst 2 cd:2 | ice 7 low | can 12 low | lin 5 cd:6 | for 5 cd:2 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The bottom lane now has both a threat and a backline plant. I’m advancing to see whether the next wave stacks a second lane before I commit to a frontline piece.
+td> next
+Level 3 | Turn 5 | Energy 2 | Waves 1/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Ske:3 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 cd:1 | bst 2 cd:1 | ice 7 low | can 12 low | lin 5 cd:5 | for 5 cd:1 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+I’m expanding the economy rather than chasing the lone skeleton. The lane pressure is still too low to justify spending energy on a premature wall or turret.
+td> deploy pwr 1 1
+That card is still recharging.
+
+codex
+The plant cooldown is one turn short, so I’m just rolling the clock once to avoid wasting energy on a weaker fallback.
+td> next
+Level 3 | Turn 6 | Energy 3 | Waves 1/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |Ske:3 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 ready | ice 7 low | can 12 low | lin 5 cd:4 | for 5 low | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The first real defense piece goes into the bottom lane now. The skeleton is already close enough for Backstabber to delete it immediately, which is exactly what I want before the lane gets any denser.
+td> deploy bst 5 9
+Deployed Backstabber at row 5, column 9.
+Level 3 | Turn 6 | Energy 1 | Waves 1/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |Ske:3 |Bst:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 low | bst 2 cd:6 | ice 7 low | can 12 low | lin 5 cd:4 | for 5 low | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The bottom-lane skeleton is lined up for a clean kill, so I’m resolving the turn to confirm the lane is stable before I start spending energy elsewhere.
+td> next
+Level 3 | Turn 7 | Energy 2 | Waves 1/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Bst:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:5 | ice 7 low | can 12 low | lin 5 cd:3 | for 5 low | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The first lane is clear, so I’m using the breathing room to add another economy plant in a fresh row instead of overcommitting to a specific attack shape too early.
+td> deploy pwr 4 1
+Deployed PowerPlant at row 4, column 1.
+Level 3 | Turn 7 | Energy 0 | Waves 1/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Bst:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 cd:2 | bst 2 cd:5 | ice 7 low | can 12 low | lin 5 cd:3 | for 5 low | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The economy line is growing, and I’m checking whether the next wave arrives before I can spend on a stronger lane piece.
+td> next
+Level 3 | Turn 8 | Energy 2 | Waves 2/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Bst:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 cd:1 | bst 2 cd:4 | ice 7 low | can 12 low | lin 5 cd:2 | for 5 low | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The new skeleton is still far out, so I’m waiting one more turn to line up the next plant rather than burning energy on a partial answer.
+td> next
+Level 3 | Turn 9 | Energy 4 | Waves 2/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Ske:3 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Bst:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:3 | ice 7 low | can 12 low | lin 5 cd:1 | for 5 low | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+I have enough banked energy for another economy plant, and the top lane skeleton is still too far away to justify converting that into damage yet.
+td> deploy pwr 1 1
+Deployed PowerPlant at row 1, column 1.
+Level 3 | Turn 9 | Energy 2 | Waves 2/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Ske:3 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Bst:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 cd:2 | bst 2 cd:3 | ice 7 low | can 12 low | lin 5 cd:1 | for 5 low | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+I’ve got a full economy row online now. I’m advancing once more to see when the first lane-specific damage card becomes affordable relative to the top-lane skeleton.
+td> next
+Level 3 | Turn 10 | Energy 4 | Waves 2/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |Ske:3 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Bst:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 cd:1 | bst 2 cd:2 | ice 7 low | can 12 low | lin 5 low | for 5 low | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The lane plan is still flexible, so I’m giving the economy one more tick to see whether the next deployment should be a plant, a backstab, or the first real splash piece.
+td> next
+Level 3 | Turn 11 | Energy 5 | Waves 2/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |Ske:3 |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Bst:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:1 | ice 7 low | can 12 low | lin 5 ready | for 5 ready | acd 5 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+I’m switching from pure scaling to lane control now. A force wall in the top lane buys a long window against the approaching skeleton and sets up a safer kill zone behind it.
+td> deploy for 1 6
+Deployed ForceWall at row 1, column 6.
+Level 3 | Turn 11 | Energy 0 | Waves 2/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:16|Ske:3 |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Bst:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 low | bst 2 cd:1 | ice 7 low | can 12 low | lin 5 low | for 5 cd:6 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The top lane is now pinned instead of leaking forward. I’m advancing one turn to turn that stall into a backstab or to react if the next wave lands somewhere else.
+td> next
+Level 3 | Turn 12 | Energy 2 | Waves 2/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|Ske:3 |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Bst:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 ready | ice 7 low | can 12 low | lin 5 low | for 5 cd:5 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The wall did its job and held the lane in place. I’m cashing that stall out now with a backstab so the lane can reset cleanly instead of letting pressure accumulate there.
+td> deploy bst 1 8
+Deployed Backstabber at row 1, column 8.
+Level 3 | Turn 12 | Energy 0 | Waves 2/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|Ske:3 |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Bst:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 low | bst 2 cd:6 | ice 7 low | can 12 low | lin 5 low | for 5 cd:5 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The top lane is set up to finish the first skeleton cleanly. I’m resolving the turn before I decide whether the next banked energy goes into more offense or another stall piece.
+td> next
+Level 3 | Turn 13 | Energy 2 | Waves 2/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Bst:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:5 | ice 7 low | can 12 low | lin 5 low | for 5 cd:4 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The first lane is under control again, so I’m holding resources for a stronger midgame piece rather than padding economy with a marginal extra plant.
+td> next
+Level 3 | Turn 14 | Energy 4 | Waves 3/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Bst:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:4 | ice 7 low | can 12 low | lin 5 low | for 5 cd:3 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+A Berserker just entered row four, and that one matters more than the old skeletons. I’m letting one turn pass so I can decide between a hard stall and a lane wipe with the exact energy available.
+td> next
+Level 3 | Turn 15 | Energy 5 | Waves 3/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Ber:6 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Bst:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:3 | ice 7 low | can 12 low | lin 5 ready | for 5 cd:2 | acd 5 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The Berserker is still far enough out that I don’t want to burn the line bomb yet. I’m waiting for the force wall cooldown to clear so I can pin it instead of paying the one-time tax.
+td> next
+Level 3 | Turn 16 | Energy 7 | Waves 3/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |Ber:6 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Bst:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:2 | ice 7 ready | can 12 low | lin 5 ready | for 5 cd:1 | acd 5 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+I’m putting the first control piece into the Berserker lane instead of cashing the emergency bomb. Slow is the better trade here because it preserves the board state and buys me time to answer the lane more cleanly.
+td> deploy ice 4 5
+Deployed IceTurret at row 4, column 5.
+Level 3 | Turn 16 | Energy 0 | Waves 3/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |  .   |  .   |Ber:6 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Bst:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 low | bst 2 cd:2 | ice 7 cd:2 | can 12 low | lin 5 low | for 5 cd:1 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The Berserker lane now has a slow effect on it. I’m resolving the turn to see whether that bought enough tempo to convert into a wall or backstab on the next cycle.
+td> next
+Level 3 | Turn 17 | Energy 2 | Waves 3/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |  .   |  .   |Ber:5 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Bst:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:1 | ice 7 cd:1 | can 12 low | lin 5 low | for 5 low | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The slow landed, and the Berserker is no longer racing the lane. I’m holding the current energy so I can spend it on a clean kill or a wall the moment the cooldown opens.
+td> next
+Level 3 | Turn 18 | Energy 4 | Waves 3/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |  .   |Ber:4 |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Bst:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 ready | ice 7 low | can 12 low | lin 5 low | for 5 low | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The Berserker is pinned and still in range, so I’m converting the stall into a guaranteed kill before it gets another chance to ramp.
+td> deploy bst 4 8
+Deployed Backstabber at row 4, column 8.
+Level 3 | Turn 18 | Energy 2 | Waves 3/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |  .   |Ber:4 |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Bst:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:6 | ice 7 low | can 12 low | lin 5 low | for 5 low | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The Berserker lane is lined up for the backstab now. I’m resolving the turn to confirm the kill and see whether the next wave lands before I spend the remaining energy.
+td> next
+Level 3 | Turn 19 | Energy 3 | Waves 3/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |  .   |  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Bst:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:5 | ice 7 low | can 12 low | lin 5 low | for 5 low | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The Berserker is gone and the board is stable again. I’m letting one more turn resolve so I can see what the next wave actually is before choosing the next lane to build out.
+td> next
+Level 3 | Turn 20 | Energy 5 | Waves 4/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |  .   |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |  .   |  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Bst:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:4 | ice 7 low | can 12 low | lin 5 ready | for 5 ready | acd 5 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+Wave four introduced a Berserker in row two, so I’m anchoring that lane immediately. A force wall there keeps it from turning into a damage race later.
+td> deploy for 2 7
+Deployed ForceWall at row 2, column 7.
+Level 3 | Turn 20 | Energy 0 | Waves 4/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |  .   |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |For:16|  .   |  .   |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |  .   |  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Bst:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 low | bst 2 cd:4 | ice 7 low | can 12 low | lin 5 low | for 5 cd:6 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+I’ve split the incoming pressure into two lanes with hard stalling pieces. I’m advancing now to verify the berserker holds the lane and to see how the skeletons advance against the existing backline.
+td> next
+Level 3 | Turn 21 | Energy 2 | Waves 4/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |Ske:3 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |For:16|  .   |Ber:6 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |  .   |  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Bst:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:3 | ice 7 low | can 12 low | lin 5 low | for 5 cd:5 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The row-one backstabber is now acting as a blocker rather than a finisher, so I’m not rushing another cheap plant into that lane. I want the next turn to tell me whether the row-two wall is enough or if I need to convert energy into a harder answer.
+td> next
+Level 3 | Turn 22 | Energy 4 | Waves 4/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |  .   |Ske:3 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |For:16|Ber:6 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |  .   |  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Bst:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:2 | ice 7 low | can 12 low | lin 5 low | for 5 cd:4 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The two active lanes are both in a controlled stalling pattern now. I’m advancing once more so I can choose the next commit based on where those monsters sit after the walls absorb their first hits.
+td> next
+Level 3 | Turn 23 | Energy 5 | Waves 4/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Ske:3 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |For:15|Ber:6 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |  .   |  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Bst:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:1 | ice 7 low | can 12 low | lin 5 ready | for 5 cd:3 | acd 5 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+Both incoming lanes are already boxed by walls, so I’m holding the bomb and waiting for the next wave tick before committing the one remaining active-card cooldown.
+td> next
+Level 3 | Turn 24 | Energy 7 | Waves 4/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|Ske:3 |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |For:14|Ber:6 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |  .   |  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Bst:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 ready | ice 7 ready | can 12 low | lin 5 ready | for 5 cd:2 | acd 5 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The board is stable enough to spend a full turn on cleanup. I’m using the remaining burst pieces now to clear the top skeleton and reset the row-two berserker before either lane starts chewing through the walls.
+td> deploy bst 1 8
+Deployed Backstabber at row 1, column 8.
+Level 3 | Turn 24 | Energy 5 | Waves 4/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|Ske:3 |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |For:14|Ber:6 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |  .   |  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Bst:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:6 | ice 7 low | can 12 low | lin 5 ready | for 5 cd:2 | acd 5 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> deploy lin 2 6
+Deployed LineBomb at row 2, column 6.
+Level 3 | Turn 24 | Energy 0 | Waves 4/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|Ske:3 |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |Lin:1 |For:14|Ber:6 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |  .   |  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Bst:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 low | bst 2 cd:6 | ice 7 low | can 12 low | lin 5 cd:10 | for 5 cd:2 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The cleanup pieces are in place. I’m resolving the turn now to confirm both lanes are actually cleared before I start rebuilding energy.
+td> next
+Level 3 | Turn 25 | Energy 2 | Waves 4/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |For:14|  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |  .   |  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Bst:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:5 | ice 7 low | can 12 low | lin 5 cd:9 | for 5 cd:1 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The cleanup worked. I’m pausing one turn to see the next spawn and preserve flexibility rather than spending on a filler plant before I know which lane needs the next hard answer.
+td> next
+Level 3 | Turn 26 | Energy 4 | Waves 5/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |  .   |Lea:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |For:14|  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |  .   |  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Bst:1 |Lea:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:4 | ice 7 low | can 12 low | lin 5 cd:8 | for 5 low | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+Leapers are the first thing that actually tests the layout, so I’m advancing one turn instead of speculating. The next board state will tell me whether the backstabbers are enough or whether I need to spend the next energy spike on a wall.
+td> next
+Level 3 | Turn 27 | Energy 5 | Waves 5/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |Lea:6 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |For:14|  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |  .   |  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |Lea:6 |Bst:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:3 | ice 7 low | can 12 low | lin 5 cd:7 | for 5 ready | acd 5 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+I’m filling the middle lane with a sprayer now. The current leaper lanes are already controlled enough, and row three is the best place to add long-term pressure without conflicting with the existing walls.
+td> deploy acd 3 6
+Deployed AcidSprayer at row 3, column 6.
+Level 3 | Turn 27 | Energy 0 | Waves 5/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |Lea:6 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |For:14|  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |Acd:1 |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |  .   |  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |Lea:6 |Bst:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 low | bst 2 cd:3 | ice 7 low | can 12 low | lin 5 cd:7 | for 5 low | acd 5 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The middle lane is now armed, so I’m resolving the turn to see how the leapers trade into the backstabs and whether the new sprayer immediately picks up any future stack.
+td> next
+Level 3 | Turn 28 | Energy 2 | Waves 5/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|Lea:6 |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |For:14|  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |Acd:1 |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |  .   |  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Bst:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:2 | ice 7 low | can 12 low | lin 5 cd:6 | for 5 low | acd 5 cd:1
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The row-five leaper has been cleaned up, and the row-one leaper is now where the wall can actually control it. I’m advancing once to see whether it gets pinned cleanly or whether I need another burst card.
+td> next
+Level 3 | Turn 29 | Energy 4 | Waves 5/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |For:14|  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |Acd:1 |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |  .   |  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Bst:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:1 | ice 7 low | can 12 low | lin 5 cd:5 | for 5 low | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The leaper pressure resolved cleanly, so I’m advancing to the next spawn tick instead of spending these four energy on another marginal plant.
+td> next
+Level 3 | Turn 30 | Energy 6 | Waves 6/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |For:14|  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |Acd:1 |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |  .   |  .   |Bst:1 |  .   |Lea:5 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Bst:1 |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 ready | ice 7 low | can 12 low | lin 5 cd:4 | for 5 ready | acd 5 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The board is stable enough that I don’t need to guess. I’m advancing one turn to see whether the row-four leaper and row-five berserker are already being contained by the existing blockers.
+td> next
+Level 3 | Turn 31 | Energy 7 | Waves 6/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |For:14|  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |Acd:1 |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |  .   |  .   |Bst:1 |  .   |Lea:4 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 ready | ice 7 ready | can 12 low | lin 5 cd:3 | for 5 ready | acd 5 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+Row five just lost its stopper, so I’m replacing it with a force wall before the berserker gets rolling. That lane is the one that can snowball fastest if I leave it open.
+td> deploy for 5 9
+Deployed ForceWall at row 5, column 9.
+Level 3 | Turn 31 | Energy 2 | Waves 6/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |For:14|  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |Acd:1 |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |  .   |  .   |Bst:1 |  .   |Lea:4 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |For:16|Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 ready | ice 7 low | can 12 low | lin 5 cd:3 | for 5 cd:6 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The row-five gap is sealed again. I’m resolving the turn to verify both the leaper lane and the berserker lane are still contained before I decide whether to use the last two energy on more income.
+td> next
+Level 3 | Turn 32 | Energy 4 | Waves 6/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |For:14|  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |Acd:1 |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |  .   |  .   |Bst:1 |Lea:3 |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |For:15|Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 ready | ice 7 low | can 12 low | lin 5 cd:2 | for 5 cd:5 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The active lanes are still contained, so I’m using the spare energy to deepen the central economy rather than forcing a small tactical trade right now.
+td> deploy pwr 3 2
+Deployed PowerPlant at row 3, column 2.
+Level 3 | Turn 32 | Energy 2 | Waves 6/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |For:14|  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |Acd:1 |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |  .   |  .   |Bst:1 |Lea:3 |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |For:15|Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 cd:2 | bst 2 ready | ice 7 low | can 12 low | lin 5 cd:2 | for 5 cd:5 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The middle economy is stronger now. I’m advancing to see whether the row-four cluster collapses on the existing ice/backstab chain or whether I need to spend the next cooldown on a lane wipe.
+td> next
+Level 3 | Turn 33 | Energy 5 | Waves 6/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |For:14|  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |Acd:1 |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |  .   |  .   |Bst:1 |Lea:2 |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |For:14|Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 cd:1 | bst 2 ready | ice 7 low | can 12 low | lin 5 cd:1 | for 5 cd:4 | acd 5 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The active threats are pinned, so I’m converting a spare turn into another economy plant in the safest open lane instead of forcing a low-value attack while the cooldowns are still lining up.
+td> deploy pwr 2 2
+That card is still recharging.
+
+codex
+The row-four cluster is the only place still building real pressure, so I’m adding a second damage source there rather than waiting for a bigger card that isn’t ready yet.
+td> deploy acd 4 6
+Deployed AcidSprayer at row 4, column 6.
+Level 3 | Turn 33 | Energy 0 | Waves 6/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |For:14|  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |Acd:1 |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |  .   |Bst:1 |Lea:2 |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |For:14|Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 cd:1 | bst 2 low | ice 7 low | can 12 low | lin 5 cd:1 | for 5 cd:4 | acd 5 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+I’ve turned the row-four lane into a stacked damage zone, so I’m resolving the turn to see whether that clears the leaper before it can spill into the backline.
+td> next
+Level 3 | Turn 34 | Energy 2 | Waves 6/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |For:14|  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |Acd:1 |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |  .   |Bst:1 |Ske:2 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |For:13|Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 ready | ice 7 low | can 12 low | lin 5 low | for 5 cd:3 | acd 5 cd:1
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The leaper in row four is gone, and the remaining lanes are stalling cleanly. I’m adding one more economy plant into a safe lane so the later waves can be answered with the expensive cards instead of running me dry.
+td> deploy pwr 2 2
+Deployed PowerPlant at row 2, column 2.
+Level 3 | Turn 34 | Energy 0 | Waves 6/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |  .   |For:14|  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |Acd:1 |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |  .   |Bst:1 |Ske:2 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |For:13|Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 cd:2 | bst 2 low | ice 7 low | can 12 low | lin 5 low | for 5 cd:3 | acd 5 cd:1
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The economy is now backfilled, so I’m advancing once more to see whether the remaining skeleton and berserker lanes keep sitting on the blockers or start drifting toward the base.
+td> next
+Level 3 | Turn 35 | Energy 2 | Waves 6/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |  .   |For:14|  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |Acd:1 |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |For:12|Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 cd:1 | bst 2 ready | ice 7 low | can 12 low | lin 5 low | for 5 cd:2 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The berserker is still tied up against the wall, so I’m not spending the last two energy on another filler plant. I want the next turn only to tell me whether the wall is starting to matter or whether a fresh wave lands.
+td> next
+Level 3 | Turn 36 | Energy 4 | Waves 7/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |  .   |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |  .   |For:14|  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |Acd:1 |  .   |  .   |  .   |Ber:5 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |For:11|Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 ready | ice 7 low | can 12 low | lin 5 low | for 5 cd:1 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+Row one is the lane that can still march toward the base without touching anything else, so I’m using the backstab there as a stopgap blocker before it gets closer to the wall line.
+td> deploy bst 1 9
+Deployed Backstabber at row 1, column 9.
+Level 3 | Turn 36 | Energy 2 | Waves 7/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |Bst:1 |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |  .   |For:14|  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |Acd:1 |  .   |  .   |  .   |Ber:5 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |For:11|Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:6 | ice 7 low | can 12 low | lin 5 low | for 5 cd:1 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The row-one stopper is in place, and the other Berserkers are already on slower tracks. I’m advancing one turn to see which lane actually needs the next hard answer.
+td> next
+Level 3 | Turn 37 | Energy 5 | Waves 7/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |  .   |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |  .   |For:14|  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |Acd:1 |  .   |  .   |Ber:4 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |For:10|Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:5 | ice 7 low | can 12 low | lin 5 ready | for 5 ready | acd 5 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+Row one is the lane that has no durable stop left, so I’m spending the bomb there instead of trying to chase the berserker with another light blocker. That resets the most exposed lane and keeps the wall line intact.
+td> deploy lin 1 5
+Deployed LineBomb at row 1, column 5.
+Level 3 | Turn 37 | Energy 0 | Waves 7/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |Lin:1 |For:15|  .   |Bst:1 |  .   |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |  .   |For:14|  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |Acd:1 |  .   |  .   |Ber:4 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |For:10|Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 low | bst 2 cd:5 | ice 7 low | can 12 low | lin 5 cd:10 | for 5 low | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The row-one bomb is armed, so I’m resolving the turn and expecting that lane to come back clean before the next wave escalates.
+td> next
+Level 3 | Turn 38 | Energy 2 | Waves 7/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |  .   |For:14|  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |Acd:1 |Ber:3 |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |For:9 |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:4 | ice 7 low | can 12 low | lin 5 cd:9 | for 5 low | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The row-three berserker is enraged, but it’s still sitting on top of a disposable sprayer. I’m letting one turn pass so I can see whether that trade leaves it pinned in place or whether I need to replace the sprayer with a wall on the next decision point.
+td> next
+Level 3 | Turn 39 | Energy 4 | Waves 7/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |  .   |For:14|  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |  .   |Ber:2 |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |For:8 |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:3 | ice 7 low | can 12 low | lin 5 cd:8 | for 5 low | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The enraged berserker in row three is the only thing that can actually break tempo right now, and I don’t have the right wall lined up at this exact energy total. I’m holding the resource and advancing once so I can place the blocker on the first turn it becomes affordable.
+td> next
+Level 3 | Turn 40 | Energy 6 | Waves 8/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |  .   |Nec:5 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |  .   |For:14|  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |  .   |Ber:2 |  .   |  .   |  .   |  .   |Lea:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |For:7 |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:2 | ice 7 low | can 12 low | lin 5 cd:7 | for 5 ready | acd 5 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+Row three just became the active berserker lane, so I’m converting that open space into a hard wall now before it can run another two-tile step and force me into a worse trade.
+td> deploy for 3 4
+Deployed ForceWall at row 3, column 4.
+Level 3 | Turn 40 | Energy 1 | Waves 8/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |  .   |Nec:5 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |  .   |For:14|  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |For:16|Ber:2 |  .   |  .   |  .   |  .   |Lea:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |For:7 |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 low | bst 2 cd:2 | ice 7 low | can 12 low | lin 5 cd:7 | for 5 cd:6 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The row-three berserker is now pinned by a proper wall. I’m advancing one turn to see whether the necromancer starts multiplying before I spend the tiny remainder of energy.
+td> next
+Level 3 | Turn 41 | Energy 4 | Waves 8/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |  .   |Nec:5 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |  .   |For:14|  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |For:14|Ber:2 |  .   |  .   |Lea:6 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |For:6 |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:1 | ice 7 low | can 12 low | lin 5 cd:6 | for 5 cd:5 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The current board can absorb a little more economy without changing the tactical picture, so I’m using the spare energy on another safe power plant and keeping the lane-specific answer for the next cooldown tick.
+td> deploy pwr 2 3
+Deployed PowerPlant at row 2, column 3.
+Level 3 | Turn 41 | Energy 2 | Waves 8/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |  .   |Nec:5 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |For:14|  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |For:14|Ber:2 |  .   |  .   |Lea:6 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |For:6 |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 cd:2 | bst 2 cd:1 | ice 7 low | can 12 low | lin 5 cd:6 | for 5 cd:5 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The board is still within control, and I’ve already used the spare energy on income. I’m advancing now so I can spend the next cooldown on the most dangerous surviving lane instead of guessing.
+td> next
+Level 3 | Turn 42 | Energy 5 | Waves 8/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |Nec:5 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |For:14|  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |For:12|Ber:2 |Lea:6 |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |For:5 |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 cd:1 | bst 2 ready | ice 7 low | can 12 low | lin 5 cd:5 | for 5 cd:4 | acd 5 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+Row three has the leaper in range now, so I’m spending the backstab on the thing that can actually jump past the wall line instead of the slower berserker behind it.
+td> deploy bst 3 7
+Deployed Backstabber at row 3, column 7.
+Level 3 | Turn 42 | Energy 3 | Waves 8/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |Nec:5 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |For:14|  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |For:12|Ber:2 |Lea:6 |Bst:1 |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |For:5 |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 cd:1 | bst 2 cd:6 | ice 7 low | can 12 low | lin 5 cd:5 | for 5 cd:4 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The leaper is lined up for the row-three backstab, which is the cleanest immediate kill on the board. I’m resolving the turn before deciding what to do about the necromancer lane.
+td> next
+Level 3 | Turn 43 | Energy 5 | Waves 8/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |  .   |For:15|  .   |Bst:1 |Nec:5 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |For:14|  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |For:10|Ber:2 |  .   |Bst:1 |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |For:4 |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:5 | ice 7 low | can 12 low | lin 5 cd:4 | for 5 cd:3 | acd 5 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The necromancer lane is the one that can create extra bodies, so I’m putting a sprayer into that row now to start converting its summons into attrition instead of letting it build a swarm for free.
+td> deploy acd 1 5
+Deployed AcidSprayer at row 1, column 5.
+Level 3 | Turn 43 | Energy 0 | Waves 8/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |Acd:1 |For:15|  .   |Bst:1 |Nec:5 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |For:14|  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |For:10|Ber:2 |  .   |Bst:1 |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |  .   |Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |For:4 |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 low | bst 2 cd:5 | ice 7 low | can 12 low | lin 5 cd:4 | for 5 cd:3 | acd 5 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The necromancer lane now has a damage source in front of it, so I’m resolving the turn to see whether that keeps the summons from overwhelming the row before I bank more energy.
+td> next
+Level 3 | Turn 44 | Energy 2 | Waves 9/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |Acd:1 |For:15|  .   |  .   |Nec:4 |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |For:14|  .   |Ske:3 |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |For:8 |Ber:2 |  .   |Bst:1 |  .   |  .   |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |  .   |Bst:1 |  .   |Ske:1 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |For:3 |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:4 | ice 7 low | can 12 low | lin 5 cd:3 | for 5 cd:2 | acd 5 cd:1
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The necromancer has started flooding nearby tiles, so I’m pausing on resource spend and advancing a turn to see which of the new skeletons actually becomes the problem lane.
+td> next
+Level 3 | Turn 45 | Energy 5 | Waves 9/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |Acd:1 |For:15|  .   |  .   |Nec:3 |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |For:14|Ske:3 |Ber:6 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |For:6 |Ber:2 |  .   |Bst:1 |  .   |Ske:3 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |  .   |Bst:1 |  .   |Lea:5 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |For:2 |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:3 | ice 7 low | can 12 low | lin 5 cd:2 | for 5 cd:1 | acd 5 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+Row four is the lane where the leaper can still turn into a bypass if I leave it open. I’m spending the wall there now to close that gap and keep the existing slow-and-sprayer stack from being outrun.
+td> deploy for 4 7
+That card is still recharging.
+
+codex
+The wall is one tick short, so I’m not forcing a backup play. I want the next board state before I commit energy to anything else, especially because the row-four leaper is still the lane most likely to slip the line.
+td> next
+Level 3 | Turn 46 | Energy 8 | Waves 9/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |Acd:1 |For:15|  .   |Nec:2 |Ske:3 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |For:13|Ske:3 |Ber:6 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |For:4 |Ber:2 |  .   |Bst:1 |Ske:3 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |  .   |Bst:1 |  .   |Lea:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |For:1 |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:2 | ice 7 ready | can 12 low | lin 5 cd:1 | for 5 ready | acd 5 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The row-four leaper is still the piece that can break the shape of the board, so I’m spending the wall there now that the cooldown is finally clear. That keeps the slow plus sprayer stack from being outpaced.
+td> deploy for 4 7
+Deployed ForceWall at row 4, column 7.
+Level 3 | Turn 46 | Energy 3 | Waves 9/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |Acd:1 |For:15|  .   |Nec:2 |Ske:3 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |For:13|Ske:3 |Ber:6 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |For:4 |Ber:2 |  .   |Bst:1 |Ske:3 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |For:16|Bst:1 |  .   |Lea:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |For:1 |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:2 | ice 7 low | can 12 low | lin 5 cd:1 | for 5 cd:6 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The row-four lane is boxed again, so I’m resolving one turn to see whether the necromancer or the row-five berserker is the more urgent target for the bomb when it comes off cooldown.
+td> next
+Level 3 | Turn 47 | Energy 5 | Waves 9/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |Acd:1 |For:15|  .   |Nec:1 |Ske:2 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |For:12|Ske:3 |Ber:6 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |For:2 |Ber:2 |  .   |  .   |Ske:3 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |For:16|Bst:1 |Lea:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:1 | ice 7 low | can 12 low | lin 5 ready | for 5 cd:5 | acd 5 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The necromancer lane is the one that can keep snowballing into extra bodies, so I’m cashing the bomb there now rather than spending it on one of the already-stalled rows.
+td> deploy lin 1 4
+Deployed LineBomb at row 1, column 4.
+Level 3 | Turn 47 | Energy 0 | Waves 9/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |Lin:1 |Acd:1 |For:15|  .   |Nec:1 |Ske:2 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |For:12|Ske:3 |Ber:6 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |For:2 |Ber:2 |  .   |  .   |Ske:3 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |For:16|Bst:1 |Lea:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 low | bst 2 cd:1 | ice 7 low | can 12 low | lin 5 cd:10 | for 5 cd:5 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The necromancer row is armed for a wipe, so I’m resolving the turn now. If the bomb works as expected, that should remove the main source of spawn pressure before it can multiply again.
+td> next
+Level 3 | Turn 48 | Energy 2 | Waves 9/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |Acd:1 |For:15|  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |For:11|Ske:3 |Ber:6 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |  .   |Ber:2 |  .   |Ske:3 |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |For:16|Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Ber:6 |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 ready | ice 7 low | can 12 low | lin 5 cd:9 | for 5 cd:4 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+Row five is the loose lane now, so I’m using the backstab there to delete the closer berserker and re-establish a blocker against the one still behind it.
+td> deploy bst 5 9
+That tile is already occupied.
+
+codex
+The row-five pair is already touching each other, so that lane needs a different answer. I’m taking the guaranteed kill on the row-three berserker now, which clears the immediate blocker while I wait for the next hard counter to recharge.
+td> deploy bst 3 6
+Deployed Backstabber at row 3, column 6.
+Level 3 | Turn 48 | Energy 0 | Waves 9/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |Acd:1 |For:15|  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |For:11|Ske:3 |Ber:6 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |  .   |Ber:2 |Bst:1 |Ske:3 |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |For:16|Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Ber:6 |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 low | bst 2 cd:6 | ice 7 low | can 12 low | lin 5 cd:9 | for 5 cd:4 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The row-three berserker is lined up for a guaranteed delete, which at least clears one of the active blockers before I decide whether the row-five pair needs the bomb or the next wall.
+td> next
+Level 3 | Turn 49 | Energy 3 | Waves 9/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |Acd:1 |For:15|  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |For:10|Ske:3 |Ber:6 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |  .   |Ske:3 |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |For:16|Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |Ber:6 |Ber:6 |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:5 | ice 7 low | can 12 low | lin 5 cd:8 | for 5 cd:3 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+Row five is the only lane that is clearly stacking toward the base now, so I’m holding resources for the moment the wall comes back instead of burning energy on another plant that won’t change that pressure.
+td> next
+Level 3 | Turn 50 | Energy 6 | Waves 10/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |Acd:1 |For:15|  .   |  .   |  .   |Her:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |For:9 |Ske:3 |Ber:6 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |Ske:3 |  .   |  .   |  .   |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |For:16|Bst:1 |  .   |Lea:4 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |Ber:6 |Ber:6 |Ber:6 |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:4 | ice 7 low | can 12 low | lin 5 cd:7 | for 5 cd:2 | acd 5 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+Row five has become the densest lane, so I’m dropping a sprayer into it now. That gives me a way to chip the whole stack while I wait for the wall cooldown to come back online.
+td> deploy acd 5 6
+Deployed AcidSprayer at row 5, column 6.
+Level 3 | Turn 50 | Energy 1 | Waves 10/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |Acd:1 |For:15|  .   |  .   |  .   |Her:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |For:9 |Ske:3 |Ber:6 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |Ske:3 |  .   |  .   |  .   |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |For:16|Bst:1 |  .   |Lea:4 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |Acd:1 |Ber:6 |Ber:6 |Ber:6 |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 low | bst 2 cd:4 | ice 7 low | can 12 low | lin 5 cd:7 | for 5 cd:2 | acd 5 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+Row five is now a stacked damage lane. I’m resolving the turn to see whether that chip plus the wall setup is enough to keep the berserker cluster from breaking through before the next hard cooldown.
+td> next
+Level 3 | Turn 51 | Energy 3 | Waves 10/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |Acd:1 |For:15|  .   |  .   |Her:3 |Nec:5 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |For:8 |Ske:3 |Ber:6 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |  .   |Ske:3 |  .   |  .   |  .   |Ske:3 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |For:16|Bst:1 |  .   |Lea:2 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |Ber:5 |Ber:5 |Ber:5 |Ske:2 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:3 | ice 7 low | can 12 low | lin 5 cd:6 | for 5 cd:1 | acd 5 cd:1
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The row-five sprayer is doing its job and buying the exact turn I needed. I’m advancing once more so I can replace it with a wall if the berserker stack stays in place, and otherwise pivot to the necromancer lane.
+td> next
+Level 3 | Turn 52 | Energy 5 | Waves 10/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |Acd:1 |For:15|  .   |Her:2 |  .   |Nec:5 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |For:7 |Ske:3 |Ber:6 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |Ske:3 |  .   |  .   |  .   |Ske:3 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |For:16|Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |  .   |Ber:5 |Ber:5 |Ber:5 |Ske:2 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:2 | ice 7 low | can 12 low | lin 5 cd:5 | for 5 ready | acd 5 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The row-five stack has moved up to the point where a real wall can catch it, so I’m placing that wall immediately instead of trying to squeeze more value out of the sprayer. This is the cleanest way to stop the stack from advancing together.
+td> deploy for 5 5
+Deployed ForceWall at row 5, column 5.
+Level 3 | Turn 52 | Energy 0 | Waves 10/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |Acd:1 |For:15|  .   |Her:2 |  .   |Nec:5 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |For:7 |Ske:3 |Ber:6 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |  .   |Ske:3 |  .   |  .   |  .   |Ske:3 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |For:16|Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |For:16|Ber:5 |Ber:5 |Ber:5 |Ske:2 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 low | bst 2 cd:2 | ice 7 low | can 12 low | lin 5 cd:5 | for 5 cd:6 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The row-five cluster now has a proper wall in front of it, so I’m resolving the turn to verify the stack doesn’t slip through before I spend the next energy spike elsewhere.
+td> next
+Level 3 | Turn 53 | Energy 3 | Waves 10/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |Acd:1 |For:15|Her:1 |  .   |Nec:5 |Lea:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |For:6 |Ske:3 |Ber:6 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Pwr:1 |Ske:3 |  .   |  .   |  .   |Ske:3 |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |For:16|Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |For:15|Ber:5 |Ber:5 |Ber:5 |Ske:2 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:1 | ice 7 low | can 12 low | lin 5 cd:4 | for 5 cd:5 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The board is crowded but still shaped by walls, so I’m not spending the current three energy on filler. I want the next tick to tell me which of the stacked lanes is actually collapsing before I pick the next burst card.
+td> next
+Level 3 | Turn 54 | Energy 6 | Waves 10/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |Acd:1 |For:15|  .   |  .   |Nec:4 |Lea:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |For:5 |Ske:3 |Ber:6 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |Ske:3 |  .   |  .   |Ske:3 |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |For:16|Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |For:14|Ber:5 |Ber:5 |Ber:5 |Ske:2 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 ready | ice 7 low | can 12 low | lin 5 cd:3 | for 5 cd:4 | acd 5 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The row-three skeleton is the only thing I can cleanly delete right now without breaking the wall structure, so I’m taking that guaranteed kill and leaving the larger stacked lanes to the next hard cooldown.
+td> deploy bst 3 7
+Deployed Backstabber at row 3, column 7.
+Level 3 | Turn 54 | Energy 4 | Waves 10/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |Acd:1 |For:15|  .   |  .   |Nec:4 |Lea:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |For:5 |Ske:3 |Ber:6 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |Ske:3 |  .   |  .   |Ske:3 |Bst:1 |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |For:16|Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |For:14|Ber:5 |Ber:5 |Ber:5 |Ske:2 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:6 | ice 7 low | can 12 low | lin 5 cd:3 | for 5 cd:4 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The row-three cleanup is in place. I’m resolving the turn before I decide whether the next high-value spend is the necromancer lane or the row-five wall line.
+td> next
+Level 3 | Turn 55 | Energy 6 | Waves 10/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |Acd:1 |For:15|  .   |Ske:3 |Nec:3 |Lea:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |For:4 |Ske:3 |Ber:6 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Ske:3 |  .   |  .   |  .   |  .   |Bst:1 |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |For:16|Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |For:13|Ber:5 |Ber:5 |Ber:5 |Ske:2 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:5 | ice 7 low | can 12 low | lin 5 cd:2 | for 5 cd:3 | acd 5 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The board is still held by walls, and the best next action is probably the bomb coming back online rather than another low-impact plant. I’m advancing to the next tick to confirm which lane has accumulated the biggest threat before I spend it.
+td> next
+Level 3 | Turn 56 | Energy 8 | Waves 11/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |Acd:1 |For:15|Ske:2 |  .   |Nec:2 |Lea:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |For:3 |Ske:3 |Ber:6 |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |Ske:3 |  .   |  .   |  .   |  .   |Bst:1 |  .   |  .   |Lea:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |For:16|Bst:1 |  .   |Ber:4 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |For:12|Ber:5 |Ber:5 |Ber:5 |Ske:2 |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:4 | ice 7 ready | can 12 low | lin 5 cd:1 | for 5 cd:2 | acd 5 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The board is still held by walls, and the bomb is one tick short. I’m advancing exactly one turn to see which lane is fattest when the bomb comes back, because that will decide whether I reset the necromancer lane or the row-five stack first.
+td> next
+Level 3 | Turn 57 | Energy 9 | Waves 11/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |Acd:1 |For:14|Ske:1 |Nec:1 |Lea:6 |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |For:2 |Ske:3 |Ber:6 |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Ske:3 |  .   |  .   |  .   |  .   |  .   |Bst:1 |Lea:6 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |For:16|Bst:1 |  .   |Ber:2 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |For:11|Ber:5 |Ber:5 |Ber:5 |Ske:2 |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:3 | ice 7 ready | can 12 low | lin 5 ready | for 5 cd:1 | acd 5 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+Row five has the fattest stack by far, and the wall there is already absorbing hits. I’m using the bomb on that lane because it clears the most monsters and leaves the wall in place, which is the best reset available right now.
+td> deploy lin 5 4
+Deployed LineBomb at row 5, column 4.
+Level 3 | Turn 57 | Energy 4 | Waves 11/30
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |Acd:1 |For:14|Ske:1 |Nec:1 |Lea:6 |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |For:2 |Ske:3 |Ber:6 |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Ske:3 |  .   |  .   |  .   |  .   |  .   |Bst:1 |Lea:6 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |For:16|Bst:1 |  .   |Ber:2 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |Lin:1 |For:11|Ber:5 |Ber:5 |Ber:5 |Ske:2 |Ber:6 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:3 | ice 7 low | can 12 low | lin 5 cd:10 | for 5 cd:1 | acd 5 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The row-five bomb is armed, and that’s the cleanest reset I have. I’m resolving the turn now, then I’ll use the remaining energy on whatever lane is still actually pressing after the wipe.
+td> next
+Level 3 | Turn 58 | Energy 7 | Waves 11/30 | Loss
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Pwr:1 |  .   |  .   |  .   |Acd:1 |For:14|Lea:5 |  .   |Ber:6 |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Pwr:1 |Pwr:1 |Pwr:1 |  .   |  .   |  .   |For:1 |Ske:3 |Ber:6 |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Ske:3 |  .   |  .   |  .   |  .   |Lea:6 |Bst:1 |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |Ice:1 |Acd:1 |For:16|Bst:1 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Pwr:1 |  .   |  .   |  .   |For:11|  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: pwr 2 ready | bst 2 cd:2 | ice 7 ready | can 12 low | lin 5 cd:9 | for 5 ready | acd 5 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+You lose.
+The game is over. Type `level 3` to replay or `quit` to leave.
+
+codex
+**Result**
+Loss on turn 58.
+
+**Key decisions**
+- Opened with a power-plant economy and spread it across the backline early.
+- Used forcewalls plus backstabbers to stall and delete early skeletons, leapers, and berserkers.
+- Reset the row-1 necromancer with a linebomb, then later reset the row-5 stack with another linebomb.
+- Added ice and acid sprayers to create kill zones, especially in the middle lanes.
+
+**Why it failed**
+- The necromancer-driven skeleton spread plus multiple berserkers/leapers eventually created too many active lanes at once.
+- By the late game, cooldowns and occupied tiles kept me from re-establishing walls fast enough before the board collapsed.
+tokens used
+183,062
+**Result**
+Loss on turn 58.
+
+**Key decisions**
+- Opened with a power-plant economy and spread it across the backline early.
+- Used forcewalls plus backstabbers to stall and delete early skeletons, leapers, and berserkers.
+- Reset the row-1 necromancer with a linebomb, then later reset the row-5 stack with another linebomb.
+- Added ice and acid sprayers to create kill zones, especially in the middle lanes.
+
+**Why it failed**
+- The necromancer-driven skeleton spread plus multiple berserkers/leapers eventually created too many active lanes at once.
+- By the late game, cooldowns and occupied tiles kept me from re-establishing walls fast enough before the board collapsed.

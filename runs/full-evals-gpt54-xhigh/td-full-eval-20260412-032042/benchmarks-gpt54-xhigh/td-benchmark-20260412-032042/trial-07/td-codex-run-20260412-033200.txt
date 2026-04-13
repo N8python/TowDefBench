@@ -1,0 +1,2111 @@
+OpenAI Codex v0.118.0 (research preview)
+--------
+workdir: /Users/natebreslow/Documents/pvzEval
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: danger-full-access
+reasoning effort: xhigh
+reasoning summaries: none
+session id: 019d7fbf-0f10-7d81-abf3-b66e3f23f12f
+--------
+user
+Beat the current tower defense level autonomously. This is a gameplay evaluation, not a coding task. Use only the provided gameplay tools to inspect state and act. Do not edit files, do not modify configuration, and do not use shell commands unless absolutely necessary. You get exactly one attempt. There is no restart tool. Use instructions and guide as needed, keep playing until the level ends in either Win or Loss, and then give a concise summary of the result and the key decisions.
+codex
+I’m treating this as a live gameplay run. First I’m pulling the rules, current board, and status so I can plan the opening without wasting turns.
+td> instructions
+Instructions:
+  This is a turn-based tower defense benchmark.
+  Goal: survive the monster waves.
+  Loss: if a monster reaches the left edge of the grid, you lose.
+  Turn flow: deploy, clear, or inspect as needed, then type `next` to resolve one turn.
+  Energy: defenses cost energy. You start with 2 energy, gain 1 ambient energy every 2 turns, and power plants make extra energy.
+  Monsters: monsters enter from the right side and move left over time.
+  Board shape: columns 1-9 are deployable; column 10 is monster-entry only.
+  Recommendation: before acting, use `guide` on every defense and monster in this level.
+  This MCP harness gives you one attempt only; there is no restart tool.
+
+Defenses in this level:
+  tur: fires at the nearest monster ahead for 1 damage.
+  pwr: generates extra energy after a short delay, then every 4 turns.
+  bar: a high-HP blocker.
+  gre: explodes once in a 3x3 area and is consumed.
+  mne: arms after a delay, then destroys the next adjacent monster.
+
+Monsters in this level:
+  ske: basic monster.
+  gob: a sturdier frontliner.
+  orc: a very tough bruiser.
+  her: marks a major wave.
+
+Mechanics:
+  Most monsters hit the defense directly in front of them for 1 damage.
+  Some special monsters break that rule; use `guide` to check exact behavior.
+  If no defense is in front of a monster, it moves forward.
+  Defenses attack or generate energy before monsters move each turn.
+  You cannot place a defense on an occupied tile.
+  A tile cannot have more than one occupant: defense or monster.
+
+Type `help` for the agent command reference and board legend.
+Level 1 | Turn 0 | Energy 2 | Waves 0/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 cd:2 | pwr 2 ready | bar 2 cd:6 | gre 6 cd:10 | mne 1 cd:6
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> help
+Commands:
+  show
+  deploy <name> <row> <col>  Example: deploy powerplant 2 4
+  clear <row> <col>          Example: clear 2 4
+  inspect <row> <col>        Example: inspect 1 10
+  guide <entry>              Detailed field guide entry
+  next                       Advance exactly one turn
+  status
+  instructions               Full gameplay guide
+Defense names ignore case, spaces, hyphens, and underscores.
+Columns 1-9 are deployable. Column 10 is monster-entry only.
+
+Board legend:
+  Tokens are <abbr>:<hp>.
+  Defenses in this level: Tur:1 Pwr:1 Bar:8 Gre:1 Mne:1
+  Monsters in this level: Ske:3 Gob:8 Orc:20 Her:3
+  . means an empty tile.
+
+Examples:
+  deploy pwr 2 4
+  clear 2 4
+  inspect 1 10
+  guide lea
+  next
+Level 1 | Turn 0 | Energy 2 | Waves 0/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 cd:2 | pwr 2 ready | bar 2 cd:6 | gre 6 cd:10 | mne 1 cd:6
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> show
+Level 1 | Turn 0 | Energy 2 | Waves 0/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 cd:2 | pwr 2 ready | bar 2 cd:6 | gre 6 cd:10 | mne 1 cd:6
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> status
+Level: Level 1
+Turn: 0
+Energy: 2
+Loadout: tur 4 cd:2 | pwr 2 ready | bar 2 cd:6 | gre 6 cd:10 | mne 1 cd:6
+Entities: none
+Level 1 | Turn 0 | Energy 2 | Waves 0/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 cd:2 | pwr 2 ready | bar 2 cd:6 | gre 6 cd:10 | mne 1 cd:6
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+I have the opening state. Next I’m pulling the exact unit stats so I can decide whether to rush economy or hold tempo on the first lanes.
+td> guide tur
+Turret
+Type: defense
+Abbreviation: tur
+Cost: 4 energy
+HP: 1
+Recharge: 2 turns
+Role: baseline lane damage.
+Behavior: attacks before monsters move each turn and fires at the nearest monster ahead for 1 damage.
+Use: efficient early offense when you need simple repeated damage.
+Level 1 | Turn 0 | Energy 2 | Waves 0/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 cd:2 | pwr 2 ready | bar 2 cd:6 | gre 6 cd:10 | mne 1 cd:6
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> guide pwr
+PowerPlant
+Type: defense
+Abbreviation: pwr
+Cost: 2 energy
+HP: 1
+Recharge: 2 turns
+Role: economy defense.
+Behavior: starts with 1 turn until its first energy pulse, then generates 1 energy every 4 turns.
+Use: invest early so later turns can support more expensive defenses and attackers.
+Level 1 | Turn 0 | Energy 2 | Waves 0/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 cd:2 | pwr 2 ready | bar 2 cd:6 | gre 6 cd:10 | mne 1 cd:6
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> guide bar
+Barricade
+Type: defense
+Abbreviation: bar
+Cost: 2 energy
+HP: 8
+Recharge: 6 turns
+Role: blocker.
+Behavior: does not attack; it only absorbs hits.
+Use: stalls a lane so your economy or attackers have time to work.
+Level 1 | Turn 0 | Energy 2 | Waves 0/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 cd:2 | pwr 2 ready | bar 2 cd:6 | gre 6 cd:10 | mne 1 cd:6
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> guide gre
+Grenade
+Type: defense
+Abbreviation: gre
+Cost: 6 energy
+HP: 1
+Recharge: 10 turns
+Role: burst area clear.
+Behavior: explodes on its action, destroys monsters in a 3x3 area around itself, and is consumed.
+Use: emergency answer when multiple monsters stack up at once.
+Level 1 | Turn 0 | Energy 2 | Waves 0/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 cd:2 | pwr 2 ready | bar 2 cd:6 | gre 6 cd:10 | mne 1 cd:6
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> guide mne
+LandMine
+Type: defense
+Abbreviation: mne
+Cost: 1 energy
+HP: 1
+Recharge: 6 turns
+Role: delayed trap.
+Behavior: arms over 3 turns. Once armed, it destroys the monster in the tile directly ahead and is consumed.
+Use: cheap answer to one monster if you have time to arm it first.
+Level 1 | Turn 0 | Energy 2 | Waves 0/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 cd:2 | pwr 2 ready | bar 2 cd:6 | gre 6 cd:10 | mne 1 cd:6
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> guide ske
+Skeleton
+Type: monster
+Abbreviation: ske
+Wave cost: 1 point
+HP: 3
+Speed: 1 tile per action
+Behavior: if a defense is directly ahead, it hits for 1 damage; otherwise it moves left.
+Threat: the default pressure unit that tests whether a lane has enough sustained damage.
+Level 1 | Turn 0 | Energy 2 | Waves 0/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 cd:2 | pwr 2 ready | bar 2 cd:6 | gre 6 cd:10 | mne 1 cd:6
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> guide gob
+Goblin
+Type: monster
+Abbreviation: gob
+Wave cost: 2 points
+HP: 8
+Speed: 1 tile per action
+Behavior: same movement and attack pattern as a Skeleton, but much tougher.
+Threat: survives light damage for longer and can force you to commit real offense to one lane.
+Level 1 | Turn 0 | Energy 2 | Waves 0/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 cd:2 | pwr 2 ready | bar 2 cd:6 | gre 6 cd:10 | mne 1 cd:6
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> guide orc
+Orc
+Type: monster
+Abbreviation: orc
+Wave cost: 4 points
+HP: 20
+Speed: 1 tile per action
+Behavior: same movement and attack pattern as a Skeleton, but with very high durability.
+Threat: a late-game tank that can overwhelm weak lanes by sheer health.
+Level 1 | Turn 0 | Energy 2 | Waves 0/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 cd:2 | pwr 2 ready | bar 2 cd:6 | gre 6 cd:10 | mne 1 cd:6
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> guide her
+Herald
+Type: monster
+Abbreviation: her
+Wave cost: 1 point
+HP: 3
+Speed: 1 tile per action
+Behavior: same as a Skeleton, but used to mark a major wave.
+Threat: mechanically ordinary, but its arrival signals a major wave milestone.
+Level 1 | Turn 0 | Energy 2 | Waves 0/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 cd:2 | pwr 2 ready | bar 2 cd:6 | gre 6 cd:10 | mne 1 cd:6
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+I know the unit rules now. I’m checking the entry cells before spending the opening energy, in case the harness exposes upcoming lane pressure there.
+td> inspect 1 10
+Tile 1, 10 is empty. This is the monster entry column.
+Level 1 | Turn 0 | Energy 2 | Waves 0/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 cd:2 | pwr 2 ready | bar 2 cd:6 | gre 6 cd:10 | mne 1 cd:6
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> inspect 2 10
+Tile 2, 10 is empty. This is the monster entry column.
+Level 1 | Turn 0 | Energy 2 | Waves 0/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 cd:2 | pwr 2 ready | bar 2 cd:6 | gre 6 cd:10 | mne 1 cd:6
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> inspect 3 10
+Tile 3, 10 is empty. This is the monster entry column.
+Level 1 | Turn 0 | Energy 2 | Waves 0/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 cd:2 | pwr 2 ready | bar 2 cd:6 | gre 6 cd:10 | mne 1 cd:6
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> inspect 4 10
+Tile 4, 10 is empty. This is the monster entry column.
+Level 1 | Turn 0 | Energy 2 | Waves 0/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 cd:2 | pwr 2 ready | bar 2 cd:6 | gre 6 cd:10 | mne 1 cd:6
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> inspect 5 10
+Tile 5, 10 is empty. This is the monster entry column.
+Level 1 | Turn 0 | Energy 2 | Waves 0/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 cd:2 | pwr 2 ready | bar 2 cd:6 | gre 6 cd:10 | mne 1 cd:6
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+I have enough to start. I’m opening with one power plant on the backline to accelerate income, then I’ll react to the first visible wave before committing the second economy slot.
+td> deploy pwr 3 1
+Deployed PowerPlant at row 3, column 1.
+Level 1 | Turn 0 | Energy 0 | Waves 0/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 cd:2 | pwr 2 cd:2 | bar 2 cd:6 | gre 6 cd:10 | mne 1 cd:6
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 1 | Energy 1 | Waves 0/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 cd:1 | pwr 2 cd:1 | bar 2 cd:5 | gre 6 cd:9 | mne 1 cd:5
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The opener is cleaner than expected: no wave yet, and the cooldown display shows future unit availability matters. I’m advancing to turn 2 to see the first spawn pattern before locking in the second plant or first turret.
+td> next
+Level 1 | Turn 2 | Energy 2 | Waves 0/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 low | pwr 2 ready | bar 2 cd:4 | gre 6 cd:8 | mne 1 cd:4
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+No pressure has shown up by turn 2, so the second power plant is worth the tempo. I’m taking the extra economy now and will pivot into turrets as soon as the board starts filling.
+td> deploy pwr 4 1
+Deployed PowerPlant at row 4, column 1.
+Level 1 | Turn 2 | Energy 0 | Waves 0/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 low | pwr 2 cd:2 | bar 2 cd:4 | gre 6 cd:8 | mne 1 cd:4
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 3 | Energy 1 | Waves 0/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 low | pwr 2 cd:1 | bar 2 cd:3 | gre 6 cd:7 | mne 1 cd:3
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 4 | Energy 2 | Waves 1/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 low | pwr 2 ready | bar 2 cd:2 | gre 6 cd:6 | mne 1 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The first wave is a single skeleton in the row with a plant, but it’s still far enough out that I don’t need a panic placement. I’m banking the energy for the earliest turret timing and watching whether the next wave adds pressure elsewhere.
+td> next
+Level 1 | Turn 5 | Energy 3 | Waves 1/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Ske:3 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 low | pwr 2 ready | bar 2 cd:1 | gre 6 cd:5 | mne 1 cd:1
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 6 | Energy 4 | Waves 1/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |Ske:3 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 cd:4 | mne 1 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+I have the first real timing window. I’m converting the pressured row into a permanent defense lane with a turret rather than burning the mine on the opening skeleton.
+td> deploy tur 3 2
+Deployed Turret at row 3, column 2.
+Level 1 | Turn 6 | Energy 0 | Waves 1/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |Ske:3 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 cd:2 | pwr 2 low | bar 2 low | gre 6 cd:4 | mne 1 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 7 | Energy 1 | Waves 1/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |Ske:2 |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 cd:1 | pwr 2 low | bar 2 low | gre 6 cd:3 | mne 1 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+I have spare energy and the mine is ready, so I’m banking tempo into the second plant row. That gives me a low-cost safety valve while the next turret comes online.
+td> deploy mne 4 2
+Deployed LandMine at row 4, column 2.
+Level 1 | Turn 7 | Energy 0 | Waves 1/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |Ske:2 |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 cd:1 | pwr 2 low | bar 2 low | gre 6 cd:3 | mne 1 cd:6
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 8 | Energy 1 | Waves 1/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |Ske:1 |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 low | pwr 2 low | bar 2 low | gre 6 cd:2 | mne 1 cd:5
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 9 | Energy 2 | Waves 2/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 low | pwr 2 ready | bar 2 ready | gre 6 cd:1 | mne 1 cd:4
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The second skeleton spawned in an empty lane, but it’s still early enough that I can wait for a proper turret instead of spending on a stopgap. I’m checking the mine state once before continuing so I know when that backline trap is actually live.
+td> inspect 4 2
+Tile 4, 2: LandMine
+HP: 1
+State: Turns to arm: 1
+Level 1 | Turn 9 | Energy 2 | Waves 2/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 low | pwr 2 ready | bar 2 ready | gre 6 cd:1 | mne 1 cd:4
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 10 | Energy 3 | Waves 2/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Ske:3 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 low | pwr 2 ready | bar 2 ready | gre 6 low | mne 1 cd:3
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 11 | Energy 4 | Waves 2/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Ske:3 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 low | mne 1 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The second lane now needs sustained damage, and this row is still clean enough to set up the turret on the true backline. That gives me the strongest long-term spot with room for a barricade in front later if needed.
+td> deploy tur 5 1
+Deployed Turret at row 5, column 1.
+Level 1 | Turn 11 | Energy 0 | Waves 2/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |Ske:3 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 cd:2 | pwr 2 low | bar 2 low | gre 6 low | mne 1 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 12 | Energy 1 | Waves 2/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |Ske:2 |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 cd:1 | pwr 2 low | bar 2 low | gre 6 low | mne 1 cd:1
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 13 | Energy 2 | Waves 2/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |Ske:1 |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 low | pwr 2 ready | bar 2 ready | gre 6 low | mne 1 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The board is stable again. I’m not forcing a third plant yet; I’d rather see whether wave 3 changes the lane pattern before I trade away the next turret timing.
+td> next
+Level 1 | Turn 14 | Energy 3 | Waves 3/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 low | pwr 2 ready | bar 2 ready | gre 6 low | mne 1 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 15 | Energy 4 | Waves 3/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |Ske:3 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 low | mne 1 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> inspect 4 2
+Tile 4, 2: LandMine
+HP: 1
+State: Armed
+Level 1 | Turn 15 | Energy 4 | Waves 3/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |Ske:3 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 low | mne 1 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The mine has the row 4 skeleton covered, so this is the point to widen the defense grid instead of overspending on that lane. I’m using the 4-energy window for a third permanent turret on an untouched row.
+td> deploy tur 2 1
+Deployed Turret at row 2, column 1.
+Level 1 | Turn 15 | Energy 0 | Waves 3/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |Ske:3 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 cd:2 | pwr 2 low | bar 2 low | gre 6 low | mne 1 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 16 | Energy 1 | Waves 3/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |Ske:3 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 cd:1 | pwr 2 low | bar 2 low | gre 6 low | mne 1 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+Only row 1 is still naked. I’m pre-arming that lane with the refreshed mine so I’m not relying on a single lucky draw before the fourth turret arrives.
+td> deploy mne 1 2
+Deployed LandMine at row 1, column 2.
+Level 1 | Turn 16 | Energy 0 | Waves 3/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |Ske:3 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 cd:1 | pwr 2 low | bar 2 low | gre 6 low | mne 1 cd:6
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 17 | Energy 1 | Waves 3/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Mne:1 |  .   |  .   |  .   |  .   |Ske:3 |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 low | pwr 2 low | bar 2 low | gre 6 low | mne 1 cd:5
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 18 | Energy 2 | Waves 3/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Mne:1 |  .   |  .   |  .   |Ske:3 |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 low | pwr 2 ready | bar 2 ready | gre 6 low | mne 1 cd:4
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+I’m holding here. The row 4 mine is still the answer to that skeleton, and preserving the bank gives me the fourth turret as soon as turn 20 instead of slipping it for extra economy.
+td> next
+Level 1 | Turn 19 | Energy 3 | Waves 3/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Mne:1 |  .   |  .   |Ske:3 |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 low | pwr 2 ready | bar 2 ready | gre 6 low | mne 1 cd:3
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 20 | Energy 4 | Waves 4/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Gob:7 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Mne:1 |  .   |Ske:3 |  .   |  .   |  .   |  .   |  .   |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 low | mne 1 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The first mixed wave is here: a goblin on the row 2 turret, and row 4 has both the mine lane and a fresh spawn. Row 4 still has enough time buffer, so I’m finishing the board’s baseline coverage instead of overreacting to the front skeleton.
+td> inspect 1 2
+Tile 1, 2: LandMine
+HP: 1
+State: Armed
+Level 1 | Turn 20 | Energy 4 | Waves 4/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Gob:7 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Mne:1 |  .   |Ske:3 |  .   |  .   |  .   |  .   |  .   |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 low | mne 1 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> inspect 4 2
+Tile 4, 2: LandMine
+HP: 1
+State: Armed
+Level 1 | Turn 20 | Energy 4 | Waves 4/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |  .   |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Gob:7 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Mne:1 |  .   |Ske:3 |  .   |  .   |  .   |  .   |  .   |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 low | mne 1 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> deploy tur 1 1
+Deployed Turret at row 1, column 1.
+Level 1 | Turn 20 | Energy 0 | Waves 4/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Gob:7 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Mne:1 |  .   |Ske:3 |  .   |  .   |  .   |  .   |  .   |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 cd:2 | pwr 2 low | bar 2 low | gre 6 low | mne 1 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 21 | Energy 1 | Waves 4/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Gob:6 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Mne:1 |Ske:3 |  .   |  .   |  .   |  .   |  .   |Ske:3 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 cd:1 | pwr 2 low | bar 2 low | gre 6 low | mne 1 cd:1
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 22 | Energy 2 | Waves 4/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |Gob:5 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |  .   |Ske:3 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 low | pwr 2 ready | bar 2 ready | gre 6 low | mne 1 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The row 4 mine paid off and reset that lane’s clock. I’m still holding energy because a real row 4 turret on turn 24 is stronger than spending 2 now on a barricade that doesn’t solve the lane.
+td> next
+Level 1 | Turn 23 | Energy 3 | Waves 4/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |  .   |  .   |  .   |  .   |  .   |Gob:4 |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |  .   |  .   |Ske:3 |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 low | pwr 2 ready | bar 2 ready | gre 6 low | mne 1 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 24 | Energy 4 | Waves 4/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |  .   |  .   |  .   |  .   |Gob:3 |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |  .   |  .   |  .   |  .   |Ske:3 |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 low | mne 1 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The timing lined up exactly. I can now turn row 4 from a trap lane into a permanent lane without giving up the plant behind it.
+td> deploy tur 4 2
+Deployed Turret at row 4, column 2.
+Level 1 | Turn 24 | Energy 0 | Waves 4/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |  .   |  .   |  .   |  .   |Gob:3 |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |  .   |  .   |Ske:3 |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 cd:2 | pwr 2 low | bar 2 low | gre 6 low | mne 1 low
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 25 | Energy 1 | Waves 4/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |  .   |  .   |  .   |Gob:2 |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |  .   |Ske:2 |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 cd:1 | pwr 2 low | bar 2 low | gre 6 low | mne 1 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 26 | Energy 2 | Waves 5/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |  .   |  .   |Gob:1 |  .   |  .   |  .   |  .   |  .   |Gob:8 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Ske:2 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |Ske:1 |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 low | pwr 2 ready | bar 2 ready | gre 6 low | mne 1 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The wave 5 board is still under control. Row 2 has a second goblin queued behind the dying one, but the timing math still works without spending into a barricade yet.
+td> next
+Level 1 | Turn 27 | Energy 3 | Waves 5/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Gob:8 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |Ske:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 low | pwr 2 ready | bar 2 ready | gre 6 low | mne 1 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The mine cooldown is effectively free pressure because planted mines persist after the cooldown refreshes. I’m using that now on row 2 to make the goblin lane much harder to break later.
+td> deploy mne 2 2
+Deployed LandMine at row 2, column 2.
+Level 1 | Turn 27 | Energy 2 | Waves 5/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |Gob:8 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |Ske:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 low | pwr 2 ready | bar 2 ready | gre 6 low | mne 1 cd:6
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 28 | Energy 3 | Waves 5/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |Gob:7 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 low | pwr 2 ready | bar 2 ready | gre 6 low | mne 1 cd:5
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The row 2 turret still fires through the mine, which settles the key rules question. From here I can freely use mines and later barricades in front of gun lanes without shutting down damage.
+td> next
+Level 1 | Turn 29 | Energy 4 | Waves 5/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |Gob:6 |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 low | mne 1 cd:4
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 30 | Energy 5 | Waves 5/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |Gob:5 |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 low | mne 1 cd:3
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 31 | Energy 6 | Waves 6/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |Gob:4 |  .   |  .   |  .   |  .   |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Ske:2 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Ske:2 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 ready | mne 1 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+Wave 6 widened the board but didn’t actually break the math. The grenade is finally online, and I’m keeping it in reserve because every current lane is still projected to hold.
+td> next
+Level 1 | Turn 32 | Energy 7 | Waves 6/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |Gob:3 |  .   |  .   |  .   |  .   |Ske:3 |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |Ske:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Ske:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 ready | mne 1 cd:1
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 33 | Energy 8 | Waves 6/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |Gob:2 |  .   |  .   |  .   |  .   |Ske:3 |Ske:3 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 ready | mne 1 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The row 2 queue is exactly where I expected it to be: the goblin is stepping into the mine next turn. I’m carrying the full grenade bank into the next wave trigger rather than cluttering lanes unnecessarily.
+td> next
+Level 1 | Turn 34 | Energy 9 | Waves 6/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |  .   |  .   |  .   |  .   |  .   |Ske:3 |Ske:3 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 ready | mne 1 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+Row 2 keeps drawing the most traffic, and I’ve got spare bank. I’m replanting the mine there now so the lane stays self-stabilizing even if the next wave stacks into it.
+td> deploy mne 2 2
+Deployed LandMine at row 2, column 2.
+Level 1 | Turn 34 | Energy 8 | Waves 6/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |Ske:3 |Ske:3 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 ready | mne 1 cd:6
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 35 | Energy 9 | Waves 6/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |Ske:2 |Ske:3 |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 ready | mne 1 cd:5
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 36 | Energy 10 | Waves 7/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |Ske:1 |Ske:3 |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Ske:2 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Gob:7 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 ready | mne 1 cd:4
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The board has enough cash now that I can start adding real padding instead of just reacting. I’m putting the first barricade in front of the row 5 turret because that lane drew the new goblin and is the best place to buy extra safety.
+td> deploy bar 5 2
+Deployed Barricade at row 5, column 2.
+Level 1 | Turn 36 | Energy 8 | Waves 7/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |Ske:1 |Ske:3 |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Ske:2 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |Bar:8 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Gob:7 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 cd:6 | gre 6 ready | mne 1 cd:4
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 37 | Energy 9 | Waves 7/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |Ske:3 |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |Ske:1 |Gob:8 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |Bar:8 |  .   |  .   |  .   |  .   |  .   |  .   |Gob:6 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 cd:5 | gre 6 ready | mne 1 cd:3
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The pressure shifted downward: row 4 now has a fresh goblin behind a skeleton, but it’s still a clean single-file lane. I’m keeping the grenade for an actual stack or an orc rather than spending into routine traffic.
+td> next
+Level 1 | Turn 38 | Energy 10 | Waves 7/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |Ske:2 |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |Gob:8 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |Bar:8 |  .   |  .   |  .   |  .   |  .   |Gob:5 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 cd:4 | gre 6 ready | mne 1 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 39 | Energy 11 | Waves 7/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |Ske:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |Gob:7 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |Bar:8 |  .   |  .   |  .   |  .   |Gob:4 |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 cd:3 | gre 6 ready | mne 1 cd:1
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 40 | Energy 12 | Waves 7/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |Gob:6 |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |Bar:8 |  .   |  .   |  .   |Gob:3 |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 cd:2 | gre 6 ready | mne 1 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The row 4 goblin is the only lane without a planted safety layer. I’m using the refreshed mine there so that lane cleans itself up before the goblin ever reaches the turret.
+td> deploy mne 4 3
+Deployed LandMine at row 4, column 3.
+Level 1 | Turn 40 | Energy 11 | Waves 7/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |Mne:1 |  .   |  .   |  .   |Gob:6 |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |Bar:8 |  .   |  .   |  .   |Gob:3 |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 cd:2 | gre 6 ready | mne 1 cd:6
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 41 | Energy 12 | Waves 8/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Orc:19|
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Ske:2 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |Mne:1 |  .   |  .   |Gob:5 |  .   |  .   |  .   |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |Bar:8 |  .   |  .   |Gob:2 |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 cd:1 | gre 6 ready | mne 1 cd:5
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The first orc showed up, but row 1 already had the exact answer preloaded: the old mine at column 2 will one-shot it once the turret walks it in. I’m still conserving the grenade because every active lane has a clean solve.
+td> next
+Level 1 | Turn 42 | Energy 13 | Waves 8/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |Orc:18|  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |Ske:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |Mne:1 |  .   |Gob:4 |  .   |  .   |  .   |Ske:3 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |Bar:8 |  .   |Gob:1 |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 ready | mne 1 cd:4
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 43 | Energy 14 | Waves 8/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |Orc:17|  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |Mne:1 |Gob:3 |  .   |  .   |  .   |Ske:3 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |Bar:8 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 ready | mne 1 cd:3
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 44 | Energy 15 | Waves 8/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |Orc:16|  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |Ske:3 |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |Bar:8 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 ready | mne 1 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The trap sequencing is working cleanly. The row 4 mine popped the goblin exactly on schedule, so I’m still carrying a full energy bank into the last two waves.
+td> next
+Level 1 | Turn 45 | Energy 16 | Waves 8/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |  .   |  .   |Orc:15|  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |  .   |  .   |Ske:2 |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |Bar:8 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 ready | mne 1 cd:1
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 46 | Energy 17 | Waves 8/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |  .   |Orc:14|  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |  .   |Ske:1 |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |Bar:8 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 ready | mne 1 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 47 | Energy 18 | Waves 9/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |Orc:13|  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Orc:20|
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |Bar:8 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Gob:7 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 ready | mne 1 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+Wave 9 finally produced the second true tank, and row 4 is the one lane that needed a fresh one-shot. I’m reloading that lane with a mine now; the timing is perfect for it to catch the orc before contact.
+td> deploy mne 4 3
+Deployed LandMine at row 4, column 3.
+Level 1 | Turn 47 | Energy 17 | Waves 9/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |  .   |Orc:13|  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |Orc:20|
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |Bar:8 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Gob:7 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 ready | mne 1 cd:6
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 48 | Energy 18 | Waves 9/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |Orc:12|  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |Orc:19|  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |Bar:8 |  .   |  .   |  .   |  .   |  .   |  .   |Gob:6 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 ready | mne 1 cd:5
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The row 1 interaction was not what I expected: the orc is sitting on column 3 and the old mine didn’t fire. I’m checking that tile immediately before I commit the last-wave response, because that affects how I handle the remaining tanks.
+td> inspect 1 2
+Tile 1, 2: LandMine
+HP: 1
+State: Armed
+Level 1 | Turn 48 | Energy 18 | Waves 9/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Mne:1 |Orc:12|  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |Orc:19|  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |Bar:8 |  .   |  .   |  .   |  .   |  .   |  .   |Gob:6 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 ready | mne 1 cd:5
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 49 | Energy 19 | Waves 9/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |Orc:18|  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |Bar:8 |  .   |  .   |  .   |  .   |  .   |Gob:5 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 ready | mne 1 cd:4
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The row 1 tank got deleted exactly one turn later, so the timing model still holds. I’m moving straight into wave 10 with the grenade bank intact.
+td> next
+Level 1 | Turn 50 | Energy 20 | Waves 9/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |Mne:1 |  .   |  .   |  .   |Orc:17|  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |Bar:8 |  .   |  .   |  .   |  .   |Gob:4 |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 ready | mne 1 cd:3
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 51 | Energy 21 | Waves 9/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |Mne:1 |  .   |  .   |Orc:16|  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |Bar:8 |  .   |  .   |  .   |Gob:3 |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 ready | mne 1 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 52 | Energy 22 | Waves 9/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |Mne:1 |  .   |Orc:15|  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |Bar:8 |  .   |  .   |Gob:2 |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 ready | mne 1 cd:1
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 53 | Energy 23 | Waves 10/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Ske:2 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Ske:2 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Ske:2 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |Mne:1 |Orc:14|  .   |  .   |  .   |  .   |  .   |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |Bar:8 |  .   |Gob:1 |  .   |  .   |  .   |  .   |  .   |Her:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 ready | mne 1 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+Wave 10 is the major wave, but it actually spawned into a board that was already loaded. The scary pieces are already spoken for: the row 4 orc is about to hit the mine, and the last-line turrets are already clipping every new spawn.
+td> next
+Level 1 | Turn 54 | Energy 24 | Waves 10/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |Ske:1 |Orc:20|
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |Ske:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |Ske:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |Ske:3 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |Bar:8 |  .   |  .   |  .   |  .   |  .   |  .   |Her:3 |Gob:8 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 ready | mne 1 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+Wave 10 is still dripping units in, and the one lane that lost its trap was row 1. I’m rebuilding that lane right now with a barricade-plus-mine stack so the fresh orc can’t convert the spent mine into a weakness.
+td> deploy bar 1 2
+Deployed Barricade at row 1, column 2.
+Level 1 | Turn 54 | Energy 22 | Waves 10/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Bar:8 |  .   |  .   |  .   |  .   |  .   |  .   |Ske:1 |Orc:20|
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |Ske:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |Ske:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |Ske:3 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |Bar:8 |  .   |  .   |  .   |  .   |  .   |  .   |Her:3 |Gob:8 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 cd:6 | gre 6 ready | mne 1 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> deploy mne 1 3
+Deployed LandMine at row 1, column 3.
+Level 1 | Turn 54 | Energy 21 | Waves 10/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Bar:8 |Mne:1 |  .   |  .   |  .   |  .   |  .   |Ske:1 |Orc:20|
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |Ske:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |Ske:1 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |Ske:3 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |Bar:8 |  .   |  .   |  .   |  .   |  .   |  .   |Her:3 |Gob:8 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 cd:6 | gre 6 ready | mne 1 cd:6
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 55 | Energy 22 | Waves 10/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Bar:8 |Mne:1 |  .   |  .   |  .   |  .   |  .   |Orc:20|  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |Ske:2 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |Bar:8 |  .   |  .   |  .   |  .   |  .   |Her:2 |Gob:8 |Ske:3 |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 cd:5 | gre 6 ready | mne 1 cd:5
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The only busy lane now is row 5, but the barricade there changed the math completely. The turret can work through the queue while the bar absorbs the goblin once it finally reaches the front.
+td> next
+Level 1 | Turn 56 | Energy 23 | Waves 10/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Bar:8 |Mne:1 |  .   |  .   |  .   |  .   |Orc:19|  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |Ske:1 |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |Bar:8 |  .   |  .   |  .   |  .   |Her:1 |Gob:8 |Ske:3 |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 cd:4 | gre 6 ready | mne 1 cd:4
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 57 | Energy 24 | Waves 10/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Bar:8 |Mne:1 |  .   |  .   |  .   |Orc:18|  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |Bar:8 |  .   |  .   |  .   |  .   |Gob:8 |Ske:3 |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 cd:3 | gre 6 ready | mne 1 cd:3
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 58 | Energy 25 | Waves 10/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Bar:8 |Mne:1 |  .   |  .   |Orc:17|  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |Bar:8 |  .   |  .   |  .   |Gob:7 |Ske:3 |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 cd:2 | gre 6 ready | mne 1 cd:2
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 59 | Energy 26 | Waves 10/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Bar:8 |Mne:1 |  .   |Orc:16|  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |Bar:8 |  .   |  .   |Gob:6 |Ske:3 |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 cd:1 | gre 6 ready | mne 1 cd:1
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 60 | Energy 27 | Waves 10/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Bar:8 |Mne:1 |Orc:15|  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |Bar:8 |  .   |Gob:5 |Ske:3 |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 ready | mne 1 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+codex
+The board is effectively won, but I can close it out faster and remove the only remaining queue. I’m dropping the grenade into row 5 so that lane disappears on the next resolution while the row 1 mine handles the last orc.
+td> deploy gre 5 4
+That tile is already occupied.
+
+td> deploy gre 4 4
+Deployed Grenade at row 4, column 4.
+Level 1 | Turn 60 | Energy 21 | Waves 10/10
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Bar:8 |Mne:1 |Orc:15|  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |Gre:1 |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |Bar:8 |  .   |Gob:5 |Ske:3 |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 cd:10 | mne 1 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+
+td> next
+Level 1 | Turn 61 | Energy 22 | Waves 10/10 | Win
+      1      2      3      4      5      6      7      8      9      10  
+   +------+------+------+------+------+------+------+------+------+------+
+ 1 |Tur:1 |Bar:8 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 2 |Tur:1 |Mne:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 3 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 4 |Pwr:1 |Tur:1 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+ 5 |Tur:1 |Bar:8 |  .   |  .   |  .   |  .   |  .   |  .   |  .   |  .   |
+   +------+------+------+------+------+------+------+------+------+------+
+Loadout: tur 4 ready | pwr 2 ready | bar 2 ready | gre 6 cd:9 | mne 1 ready
+Entry column: 10 (monster-only)
+deploy <name> <row> <col> | clear <row> <col> | inspect <row> <col> | guide <entry> | next | help | instructions
+You win.
+The game is over. Type `level 1` to replay or `quit` to leave.
+
+codex
+Win on turn 61.
+
+Key decisions:
+- Opened with two early `pwr` placements before the first wave, then converted rows 2-5 into turret lanes as pressure appeared.
+- Confirmed turrets fire through mines, then used recurring `mne` placements to one-shot the dangerous tanks, especially the row 1 and row 4 orcs.
+- Added a `bar` in front of row 5 once that lane started drawing goblins, which made the final queue safe.
+- Held the `gre` until the last cleanup, then used it at [wave 10] timing to erase the remaining row 5 queue while the final row 1 mine removed the last orc.
+
+End-state board:
+- Turrets survived on rows 1-5.
+- Power plants survived on rows 3-4.
+- Barricades survived on rows 1 and 5.
+tokens used
+91,362
+Win on turn 61.
+
+Key decisions:
+- Opened with two early `pwr` placements before the first wave, then converted rows 2-5 into turret lanes as pressure appeared.
+- Confirmed turrets fire through mines, then used recurring `mne` placements to one-shot the dangerous tanks, especially the row 1 and row 4 orcs.
+- Added a `bar` in front of row 5 once that lane started drawing goblins, which made the final queue safe.
+- Held the `gre` until the last cleanup, then used it at [wave 10] timing to erase the remaining row 5 queue while the final row 1 mine removed the last orc.
+
+End-state board:
+- Turrets survived on rows 1-5.
+- Power plants survived on rows 3-4.
+- Barricades survived on rows 1 and 5.
