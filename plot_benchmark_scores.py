@@ -12,8 +12,9 @@ import matplotlib.pyplot as plt
 
 
 RUNS_ROOT = Path("/Users/natebreslow/Documents/pvzEval/runs")
-DEFAULT_LEVELS = (1, 2, 3)
+DEFAULT_LEVELS = (1, 2, 3, 4)
 DEFAULT_SERIES = (
+    ("gpt-5.5", "xhigh"),
     ("gpt-5.4", "xhigh"),
     ("gpt-5.4-mini", "xhigh"),
 )
@@ -232,6 +233,7 @@ def load_latest_full_eval_reports(
 
 def style_maps() -> tuple[dict[str, str], dict[str, str], dict[str, str]]:
     colors = {
+        "gpt-5.5": "#047857",
         "gpt-5.4": "#B45309",
         "gpt-5.4-mini": "#2563EB",
     }

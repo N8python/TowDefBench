@@ -12,31 +12,33 @@ Level 1 is designed to be beatable by current (as of April 2026) frontier langua
 
 All levels are beatable by humans, and human-played victories can be found in the `runs/gold` directory.
 
-Per-trial score is computed as follows. If the agent wins the level, it receives a score of `1.0`. Otherwise, let `t` be the number of waves that had spawned before the agent lost, and let `T` be the total number of waves in the level. The loss score is `0.5 * (t / T)^2`, which keeps all losses in `[0, 0.5]` while rewarding deeper runs more strongly than shallow ones. An agent's overall score for a level is the average score across `20` trials with differing random seeds.
+Per-trial score is computed as follows. If the agent wins the level, it receives a score of `1.0`. Otherwise, let `t` be the number of waves that had spawned before the agent lost, and let `T` be the total number of waves in the level. The loss score is `0.5 * (t / T)^2`, which keeps all losses in `[0, 0.5]` while rewarding deeper runs more strongly than shallow ones. An agent's overall score for a level is the average score across multiple trials with differing random seeds. The default full-eval setting uses `20` trials per level.
 
 If a trial exits without a terminal win/loss state, the full-eval runner currently treats that unresolved trial as `0.0` and records it explicitly in the report.
 
 Final score is computed as `(s_1 + 2 * s_2 + 3 * s_3 + 4 * s_4) / 10`, where `s_i` is the average score for level `i`. This means that Level 4 is weighted more heavily than Level 1, reflecting its increased difficulty.
 
-A table of scores for `GPT-5.4` and `GPT-5.4-mini` at `xhigh` thinking is provided below - 95% confidence intervals are computed via percentile bootstrap with 20,000 resamples.
+A table of scores for `GPT-5.5`, `GPT-5.4`, and `GPT-5.4-mini` at `xhigh` thinking is provided below - 95% confidence intervals are computed via percentile bootstrap with 20,000 resamples.
 
-| Model | Level 1 | Level 2 | Level 3 | Level 4 |
-| --- | --- | --- | --- | --- |
-| gpt-5.4 | **0.959** (0.877, 1.000) | **0.274** (0.166, 0.408) | **0.649** (0.466, 0.821) | **0.079** (0.062, 0.101) |
-| gpt-5.4-mini | **0.886** (0.777, 0.975) | **0.090** (0.069, 0.112) | **0.137** (0.066, 0.247) | **0.120** (0.063, 0.220) |
+| Model | Trials / level | Level 1 | Level 2 | Level 3 | Level 4 |
+| --- | --- | --- | --- | --- | --- |
+| gpt-5.5 | 10 | **1.000** (1.000, 1.000) | **0.891** (0.731, 1.000) | **0.859** (0.647, 1.000) | **0.165** (0.129, 0.213) |
+| gpt-5.4 | 20 | **0.959** (0.877, 1.000) | **0.274** (0.166, 0.408) | **0.649** (0.466, 0.821) | **0.079** (0.062, 0.101) |
+| gpt-5.4-mini | 20 | **0.886** (0.777, 0.975) | **0.090** (0.069, 0.112) | **0.137** (0.066, 0.247) | **0.120** (0.063, 0.220) |
 
 And the aggregate final scores are:
 
-| Model | Final Score |
-| --- | --- |
-| gpt-5.4 | **0.3768** (0.3167, 0.4362) |
-| gpt-5.4-mini | **0.1958** (0.1561, 0.2476) |
+| Model | Trials / level | Final Score |
+| --- | --- | --- |
+| gpt-5.5 | 10 | **0.6017** (0.5359, 0.6575) |
+| gpt-5.4 | 20 | **0.3768** (0.3167, 0.4362) |
+| gpt-5.4-mini | 20 | **0.1958** (0.1561, 0.2476) |
 
 A video showing a variety of GPT-5.4 xhigh rollouts on each level can be found here:
 
 [Level 1](assets/videos/gpt-5_4-xhigh-level-1-grid.mp4) | [Level 2](assets/videos/gpt-5_4-xhigh-level-2-grid.mp4) | [Level 3](assets/videos/gpt-5_4-xhigh-level-3-grid.mp4) | [Level 4](assets/videos/gpt-5_4-xhigh-level-4-grid.mp4)
 
-Performance on the benchmark additionally scales with reasoning effort - a plot showing the difference between `none`, `low`, `medium`, `high`, and `xhigh` reasoning effort for `gpt-5.4-mini` is shown below (with `gpt-5.4` at `xhigh` shown for reference):
+Performance on the benchmark additionally scales with reasoning effort - a plot showing the difference between `none`, `low`, `medium`, `high`, and `xhigh` reasoning effort for `gpt-5.4-mini` is shown below (with `gpt-5.4` and `gpt-5.5` at `xhigh` shown for reference):
 
 ![GPT-5.4-mini reasoning levels](output/gpt54mini_codex_reasoning_curve.png)
 
@@ -324,7 +326,7 @@ TowDef-Bench is not meant to be proof of what LLMs cannot do in general - with a
 
 This benchmark has many natural extensions - the agent could be allowed multiple tries per level to measure the ability to learn from catastrophic error, or the agent could attempt all levels in sequence to measure continual learning. The main bottleneck of these extensions would be the extreme context length requirements that require agent harnesses to manage compaction. Thus these extensions may be more feasible in the future as compaction becomes more standard cross-provider, or other methods of continual learning and state management become more developed.
 
-Additionally, evaluation of models is quite sparse right now - only GPT-5.4 and GPT-5.4 mini. This is because these models are readily available through the Codex CLI where prompt caching is enabled. OpenRouter-based runs with inconsistent prompt caching could cost upwards of hundreds of dollars for the full benchmark and thus aren't included in the current release. Anthropic has its own parralel version of the responses API that supports prompt caching, but due to a lack of funds, I haven't ran the benchmark on that API yet. Building a version of the agent harness that supports Anthropic's API should be straightforward.
+Additionally, evaluation of models is quite sparse right now - only GPT-5.5, GPT-5.4, and GPT-5.4 mini. This is because these models are readily available through the Codex CLI where prompt caching is enabled. OpenRouter-based runs with inconsistent prompt caching could cost upwards of hundreds of dollars for the full benchmark and thus aren't included in the current release. Anthropic has its own parralel version of the responses API that supports prompt caching, but due to a lack of funds, I haven't ran the benchmark on that API yet. Building a version of the agent harness that supports Anthropic's API should be straightforward.
 
 #### AI Usage Disclaimer
 This benchmark was developed with substantial implementation assistance from OpenAI’s GPT-5.4 (via Codex), which helped write and refine parts of the game engine, evaluation harnesses, analysis tooling, and documentation. I assume responsibility for everything here.
