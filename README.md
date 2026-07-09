@@ -44,7 +44,7 @@ A video showing a variety of GPT-5.4 xhigh rollouts on each level can be found h
 
 Performance on the benchmark additionally scales with reasoning effort - a plot showing the difference between `none`, `low`, `medium`, `high`, and `xhigh` reasoning effort for `gpt-5.4-mini` is shown below (with `gpt-5.4` and `gpt-5.5` at `xhigh`, and `gpt-5.6-sol` at `max`, shown for reference):
 
-![GPT-5.4-mini reasoning levels with GPT-5.6-sol max](output/gpt54mini_codex_reasoning_curve_with_gpt56sol.png)
+![GPT-5.4-mini reasoning levels with GPT-5.6-sol max](output/gpt54mini_codex_reasoning_curve_with_gpt56sol_labels_fixed.png)
 
 # Documentation
 
