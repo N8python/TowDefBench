@@ -249,7 +249,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--model", default="gpt-5.4", help="Model name passed through to the benchmark harness.")
     parser.add_argument(
         "--reasoning-effort",
-        choices=["none", "minimal", "low", "medium", "high", "xhigh"],
+        choices=["none", "minimal", "low", "medium", "high", "xhigh", "max"],
         default="xhigh",
         help="Reasoning effort passed through to the benchmark harness.",
     )

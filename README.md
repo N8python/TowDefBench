@@ -8,7 +8,7 @@ This repository is released under `CC0-1.0`. See [`LICENSE`](LICENSE).
 
 TowDef consists of four unique levels for the agent to play. Level 1 is a baseline environment with simple enemies and obvious towers. Level 2 extends the duration of Level 1, adds a complex enemy that requires multi-turn state tracking, and removes easy towers that clean up monsters while adding options that reward competent early play. Level 3 adds a variety of new enemies that overwhelm the player in the late game if they were shortsighted in the early game, and shifts tower selection to towers that require more strategic foresight - either by being more expensive or by having more complex interactions. Level 4 removes all straight-shooting towers and adds enemies that can push towers back and hit towers at long range, requiring complex spatial reasoning abilities and long-term planning to beat.
 
-Level 1 is designed to be beatable by current (as of April 2026) frontier language models, Levels 2 and 3 are designed to be challenging but partially beatable by current models, and Level 4 is designed to be essentially out of reach for current models.
+Level 1 is designed to be beatable by current (as of July 2026) frontier language models, Levels 2 and 3 are designed to be challenging but partially beatable by current models, and Level 4 is designed as the hardest frontier challenge.
 
 All levels are beatable by humans, and human-played victories can be found in the `runs/gold` directory.
 
@@ -18,27 +18,31 @@ If a trial exits without a terminal win/loss state, the full-eval runner current
 
 Final score is computed as `(s_1 + 2 * s_2 + 3 * s_3 + 4 * s_4) / 10`, where `s_i` is the average score for level `i`. This means that Level 4 is weighted more heavily than Level 1, reflecting its increased difficulty.
 
-A table of scores for `GPT-5.5`, `GPT-5.4`, and `GPT-5.4-mini` at `xhigh` thinking is provided below - 95% confidence intervals are computed via percentile bootstrap with 20,000 resamples.
+A table of scores for `GPT-5.6-sol` at `max` thinking and `GPT-5.5`, `GPT-5.4`, and `GPT-5.4-mini` at `xhigh` thinking is provided below - 95% confidence intervals are computed via percentile bootstrap with 20,000 resamples.
 
-| Model | Trials / level | Level 1 | Level 2 | Level 3 | Level 4 |
-| --- | --- | --- | --- | --- | --- |
-| gpt-5.5 | 10 | **1.000** (1.000, 1.000) | **0.891** (0.731, 1.000) | **0.859** (0.647, 1.000) | **0.165** (0.129, 0.213) |
-| gpt-5.4 | 20 | **0.959** (0.877, 1.000) | **0.274** (0.166, 0.408) | **0.649** (0.466, 0.821) | **0.079** (0.062, 0.101) |
-| gpt-5.4-mini | 20 | **0.886** (0.777, 0.975) | **0.090** (0.069, 0.112) | **0.137** (0.066, 0.247) | **0.120** (0.063, 0.220) |
+| Model | Reasoning | Trials / level | Level 1 | Level 2 | Level 3 | Level 4 |
+| --- | --- | --- | --- | --- | --- | --- |
+| gpt-5.6-sol | max | 10 | **1.000** (1.000, 1.000) | **0.574** (0.310, 0.831) | **1.000** (1.000, 1.000) | **0.640** (0.406, 0.867) |
+| gpt-5.5 | xhigh | 10 | **1.000** (1.000, 1.000) | **0.891** (0.731, 1.000) | **0.859** (0.647, 1.000) | **0.165** (0.129, 0.213) |
+| gpt-5.4 | xhigh | 20 | **0.959** (0.877, 1.000) | **0.274** (0.166, 0.408) | **0.649** (0.466, 0.821) | **0.079** (0.062, 0.101) |
+| gpt-5.4-mini | xhigh | 20 | **0.886** (0.777, 0.975) | **0.090** (0.069, 0.112) | **0.137** (0.066, 0.247) | **0.120** (0.063, 0.220) |
 
 And the aggregate final scores are:
 
-| Model | Trials / level | Final Score |
-| --- | --- | --- |
-| gpt-5.5 | 10 | **0.6017** (0.5359, 0.6575) |
-| gpt-5.4 | 20 | **0.3768** (0.3167, 0.4362) |
-| gpt-5.4-mini | 20 | **0.1958** (0.1561, 0.2476) |
+| Model | Reasoning | Trials / level | Final Score |
+| --- | --- | --- | --- |
+| gpt-5.6-sol | max | 10 | **0.7709** (0.6639, 0.8766) |
+| gpt-5.5 | xhigh | 10 | **0.6017** (0.5359, 0.6575) |
+| gpt-5.4 | xhigh | 20 | **0.3768** (0.3167, 0.4362) |
+| gpt-5.4-mini | xhigh | 20 | **0.1958** (0.1561, 0.2476) |
+
+Three original `gpt-5.6-sol` Level 4 trials ended on model-capacity errors without terminal scores. The reported result replaces only those trials with lower-concurrency reruns using the same seeds; the original reports and all replacement traces are retained under `runs/full-evals-gpt56sol-max/`.
 
 A video showing a variety of GPT-5.4 xhigh rollouts on each level can be found here:
 
 [Level 1](assets/videos/gpt-5_4-xhigh-level-1-grid.mp4) | [Level 2](assets/videos/gpt-5_4-xhigh-level-2-grid.mp4) | [Level 3](assets/videos/gpt-5_4-xhigh-level-3-grid.mp4) | [Level 4](assets/videos/gpt-5_4-xhigh-level-4-grid.mp4)
 
-Performance on the benchmark additionally scales with reasoning effort - a plot showing the difference between `none`, `low`, `medium`, `high`, and `xhigh` reasoning effort for `gpt-5.4-mini` is shown below (with `gpt-5.4` and `gpt-5.5` at `xhigh` shown for reference):
+Performance on the benchmark additionally scales with reasoning effort - a plot showing the difference between `none`, `low`, `medium`, `high`, and `xhigh` reasoning effort for `gpt-5.4-mini` is shown below (with `gpt-5.4` and `gpt-5.5` at `xhigh`, and `gpt-5.6-sol` at `max`, shown for reference):
 
 ![GPT-5.4-mini reasoning levels](output/gpt54mini_codex_reasoning_curve.png)
 
@@ -277,6 +281,8 @@ python /Users/natebreslow/Documents/pvzEval/run_full_eval.py \
   --reasoning-effort xhigh
 ```
 
+`--reasoning-effort` accepts `none`, `minimal`, `low`, `medium`, `high`, `xhigh`, and `max`. Use `max` only with models that support it, such as `gpt-5.6-sol`.
+
 By default, this runs:
 
 - levels `1 2 3 4`
@@ -326,7 +332,7 @@ TowDef-Bench is not meant to be proof of what LLMs cannot do in general - with a
 
 This benchmark has many natural extensions - the agent could be allowed multiple tries per level to measure the ability to learn from catastrophic error, or the agent could attempt all levels in sequence to measure continual learning. The main bottleneck of these extensions would be the extreme context length requirements that require agent harnesses to manage compaction. Thus these extensions may be more feasible in the future as compaction becomes more standard cross-provider, or other methods of continual learning and state management become more developed.
 
-Additionally, evaluation of models is quite sparse right now - only GPT-5.5, GPT-5.4, and GPT-5.4 mini. This is because these models are readily available through the Codex CLI where prompt caching is enabled. OpenRouter-based runs with inconsistent prompt caching could cost upwards of hundreds of dollars for the full benchmark and thus aren't included in the current release. Anthropic has its own parralel version of the responses API that supports prompt caching, but due to a lack of funds, I haven't ran the benchmark on that API yet. Building a version of the agent harness that supports Anthropic's API should be straightforward.
+Additionally, evaluation of models is quite sparse right now - only GPT-5.6-sol, GPT-5.5, GPT-5.4, and GPT-5.4 mini. This is because these models are readily available through the Codex CLI where prompt caching is enabled. OpenRouter-based runs with inconsistent prompt caching could cost upwards of hundreds of dollars for the full benchmark and thus aren't included in the current release. Anthropic has its own parallel version of the responses API that supports prompt caching, but due to a lack of funds, I haven't run the benchmark on that API yet. Building a version of the agent harness that supports Anthropic's API should be straightforward.
 
 #### AI Usage Disclaimer
 This benchmark was developed with substantial implementation assistance from OpenAI’s GPT-5.4 (via Codex), which helped write and refine parts of the game engine, evaluation harnesses, analysis tooling, and documentation. I assume responsibility for everything here.

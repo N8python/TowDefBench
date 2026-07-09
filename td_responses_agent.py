@@ -630,7 +630,7 @@ def main():
     parser.add_argument("--api-key-file", default=None, help="Optional path to a file containing the OpenAI API key.")
     parser.add_argument(
         "--reasoning-effort",
-        choices=["none", "minimal", "low", "medium", "high", "xhigh"],
+        choices=["none", "minimal", "low", "medium", "high", "xhigh", "max"],
         default=None,
         help="Optional Responses reasoning effort, sent as reasoning.effort.",
     )

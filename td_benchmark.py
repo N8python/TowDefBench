@@ -367,7 +367,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--model", default=None, help="Optional model override passed through to the selected harness.")
     parser.add_argument(
         "--reasoning-effort",
-        choices=["none", "minimal", "low", "medium", "high", "xhigh"],
+        choices=["none", "minimal", "low", "medium", "high", "xhigh", "max"],
         default=None,
         help="Optional reasoning effort passed through to the selected harness.",
     )

@@ -14,11 +14,12 @@ import matplotlib.pyplot as plt
 RUNS_ROOT = Path("/Users/natebreslow/Documents/pvzEval/runs")
 DEFAULT_LEVELS = (1, 2, 3, 4)
 DEFAULT_SERIES = (
+    ("gpt-5.6-sol", "max"),
     ("gpt-5.5", "xhigh"),
     ("gpt-5.4", "xhigh"),
     ("gpt-5.4-mini", "xhigh"),
 )
-REASONING_ORDER = ("none", "low", "medium", "high", "xhigh")
+REASONING_ORDER = ("none", "low", "medium", "high", "xhigh", "max")
 
 
 @dataclass(frozen=True)
@@ -233,6 +234,7 @@ def load_latest_full_eval_reports(
 
 def style_maps() -> tuple[dict[str, str], dict[str, str], dict[str, str]]:
     colors = {
+        "gpt-5.6-sol": "#C0262D",
         "gpt-5.5": "#047857",
         "gpt-5.4": "#B45309",
         "gpt-5.4-mini": "#2563EB",
@@ -243,6 +245,7 @@ def style_maps() -> tuple[dict[str, str], dict[str, str], dict[str, str]]:
         "medium": "--",
         "high": "-.",
         "xhigh": "-",
+        "max": "-",
     }
     markers = {
         "none": "o",
@@ -250,6 +253,7 @@ def style_maps() -> tuple[dict[str, str], dict[str, str], dict[str, str]]:
         "medium": "o",
         "high": "s",
         "xhigh": "D",
+        "max": "*",
     }
     return colors, linestyles, markers
 
@@ -304,9 +308,10 @@ def make_plot_by_level(
             zorder=1,
         )
 
-    label_min_gap = 0.045
+    label_min_gap = 0.06
     label_base_offset = 0.022
-    x_offsets = (-0.06, -0.02, 0.02, 0.06, -0.09, 0.09)
+    x_offset_step = 0.05
+    x_offsets = [x_offset_step * (index - (len(series_specs) - 1) / 2) for index in range(len(series_specs))]
     for level_index, x in enumerate(x_positions):
         level_labels: list[tuple[float, SeriesSpec]] = []
         for spec in series_specs:
@@ -341,7 +346,7 @@ def make_plot_by_level(
         for spec in series_specs
         for level_index in range(len(levels))
     )
-    ax.set_xlim(min(levels) - 0.15, max(levels) + 0.15)
+    ax.set_xlim(min(levels) - 0.2, max(levels) + 0.2)
     ax.set_ylim(0, max(1.08, max_top + 0.12))
     ax.set_xticks(levels, [f"Level {level}" for level in levels])
     ax.set_ylabel("Average Score")
@@ -369,7 +374,16 @@ def make_plot_aggregate_by_reasoning(
     if not efforts:
         raise SystemExit(f"No full eval reports found for model={model!r}.")
 
-    x_positions = list(range(len(efforts)))
+    reference_results: dict[SeriesSpec, FullEvalResult] = {}
+    for spec in reference_points:
+        ref_map = load_latest_full_eval_reports(RUNS_ROOT, backend, spec.model)
+        if spec.reasoning_effort not in ref_map:
+            raise SystemExit(f"Missing full eval report for reference series {spec.label}.")
+        reference_results[spec] = ref_map[spec.reasoning_effort]
+
+    reference_efforts = {spec.reasoning_effort for spec in reference_points}
+    axis_efforts = [effort for effort in REASONING_ORDER if effort in results or effort in reference_efforts]
+    x_positions = [axis_efforts.index(effort) for effort in efforts]
     scores = [results[effort].aggregate_score for effort in efforts]
     lower_errs = [max(0.0, result.aggregate_score - result.ci_low) for result in (results[e] for e in efforts)]
     upper_errs = [max(0.0, result.ci_high - result.aggregate_score) for result in (results[e] for e in efforts)]
@@ -414,19 +428,10 @@ def make_plot_aggregate_by_reasoning(
 
     reference_tops: list[float] = []
     if reference_points:
-        reference_results: dict[SeriesSpec, FullEvalResult] = {}
-        for spec in reference_points:
-            ref_map = load_latest_full_eval_reports(RUNS_ROOT, backend, spec.model)
-            if spec.reasoning_effort not in ref_map:
-                raise SystemExit(f"Missing full eval report for reference series {spec.label}.")
-            reference_results[spec] = ref_map[spec.reasoning_effort]
-
         for spec in reference_points:
             result = reference_results[spec]
             reference_tops.append(result.ci_high)
-            if spec.reasoning_effort not in efforts:
-                continue
-            x = efforts.index(spec.reasoning_effort)
+            x = axis_efforts.index(spec.reasoning_effort)
             color = colors.get(spec.model, "#374151")
             ax.errorbar(
                 [x],
@@ -467,9 +472,9 @@ def make_plot_aggregate_by_reasoning(
 
     max_top = max([results[effort].ci_high for effort in efforts] + reference_tops)
     right_padding = 0.3 if reference_points else 0.15
-    ax.set_xlim(-0.25, len(efforts) - 1 + right_padding if len(efforts) > 1 else 0.25 + right_padding)
+    ax.set_xlim(-0.25, len(axis_efforts) - 1 + right_padding if len(axis_efforts) > 1 else 0.25 + right_padding)
     ax.set_ylim(0, max(0.25, max_top + 0.1))
-    ax.set_xticks(x_positions, [effort for effort in efforts])
+    ax.set_xticks(range(len(axis_efforts)), axis_efforts)
     ax.set_xlabel("Reasoning Effort")
     ax.set_ylabel("Aggregate Score")
     ax.set_title(title, pad=14, fontsize=15, fontweight="bold")
