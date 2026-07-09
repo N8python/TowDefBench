@@ -459,11 +459,12 @@ def make_plot_aggregate_by_reasoning(
                 zorder=3,
                 label=spec.label,
             )
+            is_rightmost_effort = x == len(axis_efforts) - 1
             ax.text(
-                x + 0.05,
+                x - 0.07 if is_rightmost_effort else x + 0.05,
                 result.aggregate_score + 0.012,
                 f"{result.aggregate_score:.3f}".rstrip("0").rstrip("."),
-                ha="left",
+                ha="right" if is_rightmost_effort else "left",
                 va="bottom",
                 fontsize=8.5,
                 color=color,
